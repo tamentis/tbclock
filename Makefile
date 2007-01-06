@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.1.1.1 2007-01-06 09:45:42 tamentis Exp $
+# $Id: Makefile,v 1.2 2007-01-06 14:11:52 tamentis Exp $
 #
 # Copyright (c) 2007 Bertrand Janin <tamentis@neopulsar.org>
 # All rights reserved.
@@ -33,3 +33,9 @@ all: tbclock
 
 tbclock: tbclock.c
 	$(CC) $(CFLAGS) $(LIBFLAGS) tbclock.c -o tbclock
+
+install:
+	install -m 755 tbclock /usr/local/bin/
+
+clean:
+	rm -f tbclock
