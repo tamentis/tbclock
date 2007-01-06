@@ -1,9 +1,5 @@
 /*
- * This is tbclock (Tamentis Binary Clock).
- * $Id: tbclock.c,v 1.1.1.1 2007-01-06 09:45:42 tamentis Exp $
- *
- * Compile this with :
- * 	gcc -lncurses tbclock.c -Wall -O -o tbclock
+ * $Id: tbclock.c,v 1.2 2007-01-06 14:10:42 tamentis Exp $
  *
  * Copyright (c) 2007 Bertrand Janin <tamentis@neopulsar.org>
  * All rights reserved.
@@ -28,136 +24,176 @@
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
+ *
+ * tbclock (Tamentis Binary Clock)
+ *
+ * Compile with :
+ * 	gcc -lncurses tbclock.c -Wall -O -o tbclock
+ *
+ * Changelog since 1.1.1.1
+ * -----------------------
+ *	* Should work on any terminal resolution above 8x5
+ *	* Should also work on monochrome terminals.
+ *	* Blocks will scale depending of the size of the terminal.
+ *	* Stop if the terminal is resized (to be fixed...)
+ *	* Reorganized functions.
+ *
  */
 
 #include <sys/ioctl.h>
 
+#include <signal.h>
 #include <unistd.h>
 #include <time.h>
 #include <curses.h>
 #include <stdlib.h>
 
-static WINDOW *mainwnd;
 static WINDOW *screen;
 int now_sec, now_min, now_hour;
+int top_margin, left_margin;
+int dot_w, dot_h;
+int dot_sw, dot_sh;
+int height = 24, width = 80;
+int color;
+
 
 void
-check_res()
+dot(WINDOW *screen, int valid, int x, int y, short color)
 {
-	struct winsize ws;
+	int i, j;
+	char c[2] = "#";
 
-	if (ioctl(STDIN_FILENO, TIOCGWINSZ, &ws) != -1) {
-		if (ws.ws_row != 24 || ws.ws_col != 80) {
-			fprintf(stderr, "Only works on 80x24 terminals.\n");
-			exit(-1);
+	if (!valid) {
+		color = 0;
+		c[0] = ' ';
+	}
+
+	wbkgdset(screen, COLOR_PAIR(color));
+	for (i = 0; i < dot_h; i++) {
+		for (j = 0; j < dot_w; j++) {
+			mvwprintw(screen, y + i, x + j, c);
 		}
 	}
 }
 
 
 void
-screen_init(void)
+line(WINDOW *screen, int hms, int y, short color)
 {
-	mainwnd = initscr();
-	noecho();
-	cbreak();
-	nodelay(mainwnd, TRUE);
-	refresh();
-	wrefresh(mainwnd);
-	screen = newwin(24, 80, 0, 0);
-	box(screen, ACS_VLINE, ACS_HLINE);
-}
-
-
-void
-print_one_dot(int x, int y, WINDOW *screen, short color)
-{
-	wbkgdset(screen, COLOR_PAIR(color));
-	mvwprintw(screen, y, x,"      ");
-	mvwprintw(screen, y+1, x,"      ");
-	mvwprintw(screen, y+2, x,"      ");
-}
-
-void
-dot(WINDOW *screen, int valid, int x, int y, short color)
-{
-	if (valid) 
-		print_one_dot(x, y, screen, color);
-	else
-		print_one_dot(x, y, screen, 0);
+	dot(screen, hms&32, left_margin     , y, color);
+	dot(screen, hms&16, left_margin + (dot_w+dot_sw), y, color);
+	dot(screen, hms&8,  left_margin + (dot_w+dot_sw)*2, y, color);
+	dot(screen, hms&4,  left_margin + (dot_w+dot_sw)*3, y, color);
+	dot(screen, hms&2,  left_margin + (dot_w+dot_sw)*4, y, color);
+	dot(screen, hms&1,  left_margin + (dot_w+dot_sw)*5, y, color);
 }
 
 
 void
 update_display(void)
 {
-	check_res();
+	time_t now;
+	struct tm *tm;
 
-	/* Hour ... in blue */
-	init_pair(1, COLOR_BLUE, COLOR_BLUE);
-	dot(screen, now_hour&16, 22, 5, 1);
-	dot(screen, now_hour&8,  32, 5, 1);
-	dot(screen, now_hour&4,  42, 5, 1);
-	dot(screen, now_hour&2,  52, 5, 1);
-	dot(screen, now_hour&1,  62, 5, 1);
+	now = time(NULL);
+	tm = localtime(&now);
 
-	/* Minutes ... in red */
-	init_pair(2, COLOR_RED, COLOR_RED);
-	dot(screen, now_min&32, 12, 10, 2);
-	dot(screen, now_min&16, 22, 10, 2);
-	dot(screen, now_min&8,  32, 10, 2);
-	dot(screen, now_min&4,  42, 10, 2);
-	dot(screen, now_min&2,  52, 10, 2);
-	dot(screen, now_min&1,  62, 10, 2);
-
-	/* Seconds... yellow */
-	init_pair(3, COLOR_YELLOW, COLOR_YELLOW);
-	dot(screen, now_sec&32, 12, 15, 3);
-	dot(screen, now_sec&16, 22, 15, 3);
-	dot(screen, now_sec&8,  32, 15, 3);
-	dot(screen, now_sec&4,  42, 15, 3);
-	dot(screen, now_sec&2,  52, 15, 3);
-	dot(screen, now_sec&1,  62, 15, 3);
+	line(screen, tm->tm_hour, top_margin, 1);
+	line(screen, tm->tm_min,  top_margin + dot_h + dot_sh, 2);
+	line(screen, tm->tm_sec,  top_margin + (dot_h+dot_sh)*2, 3);
 
 	wrefresh(screen);
 	refresh();
 }
 
 
-void screen_end(void) {
-   endwin();
-}
-
-
 void
-maketime(void)
+resize(int signal)
 {
-	time_t now;
-	struct tm *now_tm;
+	//struct winsize ws;
+	//int nw, nh;
 
-	now = time (NULL);
-	now_tm = localtime (&now);
-	now_sec = now_tm->tm_sec;
-	now_min = now_tm->tm_min;
-	now_hour = now_tm->tm_hour;
+	endwin();
+	fprintf(stderr, "I don't like when you resize your term... sorry\n");
+	exit(-1);
+
+#if 0
+	// This is unstable code to handle resizing... it hangs sometimes
+	if (ioctl(STDIN_FILENO, TIOCGWINSZ, &ws) != -1) {
+		nw = ws.ws_col;
+		nh = ws.ws_row;
+
+		if (nw == width && nh == height) 
+			return;
+	} else {
+		return;
+	}
+
+
+	delwin(screen);
+	screen = newwin(nh, nw, 0, 0);
+	box(screen, ACS_VLINE, ACS_HLINE);
+#endif
 }
 
 
 int
 main(int ac, char **av)
 {
-	screen_init();
-	start_color();
+	struct winsize ws;
+	WINDOW *mainwnd;
 
+	signal(SIGWINCH, resize);
+
+	if (ioctl(STDIN_FILENO, TIOCGWINSZ, &ws) != -1) {
+		width = ws.ws_col;
+		height = ws.ws_row;
+	}
+
+	/* Deny too small terminals */
+	if (height < 5 || width < 8) {
+		endwin();
+		fprintf(stderr, "The smallest allowed terminal is 8x5\n");
+		exit(-1);
+	}
+
+	/* Screen Initialization */
+	mainwnd = initscr();
+	noecho();
+	cbreak();
+	nodelay(mainwnd, TRUE);
+
+	/* Prepare the 3 colors */
+	start_color();
+	init_pair(1, COLOR_BLUE, COLOR_BLUE);
+	init_pair(2, COLOR_RED, COLOR_RED);
+	init_pair(3, COLOR_YELLOW, COLOR_YELLOW);
+
+	/* Dot sizes */
+	dot_h  = height / 8; if (dot_h < 1) dot_h = 1;
+	dot_sh = height / 12;
+	dot_w  = width / 12; if (dot_w < 1) dot_w = 1;
+	dot_sw = width / 20;
+
+	/* Calculate margins... */
+	top_margin = (height - 3 * dot_h - dot_sh * 2) / 2;
+	left_margin = (width - 6 * dot_w - dot_sw * 5) / 2;
+
+	/* Prepare inside frame */
+	screen = newwin(height, width, 0, 0);
+	box(screen, ACS_VLINE, ACS_HLINE);
+	mvwprintw(screen, 0, width-10, "tbclock");
+
+	/* Main loop */
 	for (;;) {
 		if (getch() != -1)
 			break;
-		maketime();
 		update_display();
 		sleep(1);
 	}
 
-	screen_end();
+	endwin();
+	printf("Thanks for using tbclock!\n");
 
 	return (0);
 }
