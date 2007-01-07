@@ -29,28 +29,26 @@
  * clock in your terminal. If you don't know how to read this, just
  * check out wikipedia for binary. It doesn't support resizing,
  * there is a few lines in the source to do that, but disabled ;)
- * It is known to work on Linux and OpenBSD, it's quite simple and
- * should work everywhere...
+ * It is known to work on Linux, OpenBSD and Darwin/Mac OSX, it's 
+ * quite simple and should work everywhere...
  *
  * Compile with :
  * 	gcc -lncurses tbclock.c -Wall -O -o tbclock
  *
- * --------------------------------------------------------------------
- * Changelog since 1.2
- * --------------------------------------------------------------------
- *  	* You can disable frame and borders between blocks.
- *  	* Those options can be accessed via command line arguments.
- *  	* You can now use tbclock in transparent terminals.
- *  	* If terminal is too small, frame and borders are removed 
+ * Changes in tbclock-1.4
+ * 	- Cursor is set invisible.
+ * Changes in tbclock-1.3
+ *  	- You can disable frame and borders between blocks.
+ *  	- Those options can be accessed via command line arguments.
+ *  	- You can now use tbclock in transparent terminals.
+ *  	- If terminal is too small, frame and borders are removed 
  *  	  automagically.
- * --------------------------------------------------------------------
- * Changelog since 1.1
- * --------------------------------------------------------------------
- *	* Should work on any terminal resolution above 8x5
- *	* Should also work on monochrome terminals.
- *	* Blocks will scale depending of the size of the terminal.
- *	* Stop if the terminal is resized (to be fixed...)
- *	* Reorganized functions.
+ * Changes in tbclock-1.2
+ *	- Should work on any terminal resolution above 8x5
+ *	- Should also work on monochrome terminals.
+ *	- Blocks will scale depending of the size of the terminal.
+ *	- Stop if the terminal is resized (to be fixed...)
+ *	- Reorganized functions.
  *
  */
 
@@ -62,7 +60,7 @@
 #include <curses.h>
 #include <stdlib.h>
 
-#define TBCVER "$Id: tbclock.c,v 1.3 2007-01-06 16:18:07 tamentis Exp $"
+#define TBCVER "$Id: tbclock.c,v 1.4 2007-01-07 10:30:13 tamentis Exp $"
 
 static WINDOW *screen;
 int now_sec, now_min, now_hour;
@@ -163,6 +161,7 @@ main(int ac, char **av)
 	while ((ch = getopt(ac, av, "vfb")) != -1) {
 		switch (ch) {
 		case 'v':
+			fprintf(stderr, "tbclock - Tamentis Binary Clock (c) 2007 Bertrand Janin\n");
 			fprintf(stderr, "%s\n", TBCVER);
 			exit(-1);
 		case 'f':
@@ -204,6 +203,7 @@ main(int ac, char **av)
 	mainwnd = initscr();
 	noecho();
 	cbreak();
+	curs_set(0);
 	nodelay(mainwnd, TRUE);
 
 
@@ -242,7 +242,7 @@ main(int ac, char **av)
 	screen = newwin(height, width, 0, 0);
 	if (frame) {
 		box(screen, ACS_VLINE, ACS_HLINE);
-		mvwprintw(screen, 0, width-10, "tbclock");
+		mvwprintw(screen, 0, width-15, "tbclock v1.4");
 	}
 
 	/* Main loop */
