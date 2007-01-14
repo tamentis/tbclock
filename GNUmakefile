@@ -1,4 +1,4 @@
-# $Id: GNUmakefile,v 1.1 2007-01-14 22:42:46 tamentis Exp $
+# $Id: GNUmakefile,v 1.2 2007-01-14 22:48:36 tamentis Exp $
 #
 # Copyright (c) 2007 Bertrand Janin <tamentis@neopulsar.org>
 # All rights reserved.
@@ -25,10 +25,11 @@
 # SUCH DAMAGE.
 # 
 
-CC = cc
-CFLAGS = -Wall -O
-LIBFLAGS = -lncurses
-OBJ = tbclock.o guessbin.o
+CC=		cc
+OS:=		$(shell uname)
+CFLAGS=		-Wall -O
+LIBFLAGS=	-lncurses
+OBJ=		tbclock.o guessbin.o
 MANDIR=		/usr/local/man
 
 ifeq ($(OS),Linux)
