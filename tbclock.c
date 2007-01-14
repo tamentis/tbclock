@@ -1,4 +1,5 @@
-/*
+/* $Id: tbclock.c,v 1.5 2007-01-14 22:42:46 tamentis Exp $
+ *
  * Copyright (c) 2007 Bertrand Janin <tamentis@neopulsar.org>
  * All rights reserved.
  * 
@@ -23,46 +24,21 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  *
- * tbclock (Tamentis Binary Clock)
- * ===============================
- * This is a quick dirty little app to display a full screen binary
- * clock in your terminal. If you don't know how to read this, just
- * check out wikipedia for binary. It doesn't support resizing,
- * there is a few lines in the source to do that, but disabled ;)
- * It is known to work on Linux, OpenBSD and Darwin/Mac OSX, it's 
- * quite simple and should work everywhere...
- *
- * Compile with :
- * 	gcc -lncurses tbclock.c -Wall -O -o tbclock
- *
- * Changes in tbclock-1.4
- * 	- Cursor is set invisible.
- * Changes in tbclock-1.3
- *  	- You can disable frame and borders between blocks.
- *  	- Those options can be accessed via command line arguments.
- *  	- You can now use tbclock in transparent terminals.
- *  	- If terminal is too small, frame and borders are removed 
- *  	  automagically.
- * Changes in tbclock-1.2
- *	- Should work on any terminal resolution above 8x5
- *	- Should also work on monochrome terminals.
- *	- Blocks will scale depending of the size of the terminal.
- *	- Stop if the terminal is resized (to be fixed...)
- *	- Reorganized functions.
- *
  */
 
 #include <sys/ioctl.h>
 
+#include <string.h>
 #include <signal.h>
 #include <unistd.h>
-#include <time.h>
 #include <curses.h>
 #include <stdlib.h>
+#include <time.h>
 
-#define TBCVER "$Id: tbclock.c,v 1.4 2007-01-07 10:30:13 tamentis Exp $"
+#define TBCVER "tbclock 1.5"
+#define TBCCOPY TBCVER " - Tamentis Binary Clock (c) 2007 Bertrand Janin\n"
 
-static WINDOW *screen;
+WINDOW *screen;
 int now_sec, now_min, now_hour;
 int top_margin, left_margin;
 int dot_w, dot_h;
@@ -70,6 +46,7 @@ int dot_sw, dot_sh;
 int height = 24, width = 80;
 int color;
 
+void game_guessbin();
 
 void
 dot(WINDOW *screen, int valid, int x, int y, short color)
@@ -94,30 +71,12 @@ dot(WINDOW *screen, int valid, int x, int y, short color)
 void
 line(WINDOW *screen, int hms, int y, short color)
 {
-	dot(screen, hms&32, left_margin     , y, color);
-	dot(screen, hms&16, left_margin + (dot_w+dot_sw), y, color);
+	dot(screen, hms&32, left_margin,                    y, color);
+	dot(screen, hms&16, left_margin + (dot_w+dot_sw),   y, color);
 	dot(screen, hms&8,  left_margin + (dot_w+dot_sw)*2, y, color);
 	dot(screen, hms&4,  left_margin + (dot_w+dot_sw)*3, y, color);
 	dot(screen, hms&2,  left_margin + (dot_w+dot_sw)*4, y, color);
 	dot(screen, hms&1,  left_margin + (dot_w+dot_sw)*5, y, color);
-}
-
-
-void
-update_display(void)
-{
-	time_t now;
-	struct tm *tm;
-
-	now = time(NULL);
-	tm = localtime(&now);
-
-	line(screen, tm->tm_hour, top_margin, 1);
-	line(screen, tm->tm_min,  top_margin + dot_h + dot_sh, 2);
-	line(screen, tm->tm_sec,  top_margin + (dot_h+dot_sh)*2, 3);
-
-	wrefresh(screen);
-	refresh();
 }
 
 
@@ -151,17 +110,45 @@ resize(int signal)
 }
 
 
+/* Main loop for the 'clock-only' version */
+void
+justclock()
+{
+	time_t now;
+	struct tm *tm;
+
+	for (;;) {
+		if (getch() != -1)
+			break;
+
+		now = time(NULL);
+		tm = localtime(&now);
+
+		line(screen, tm->tm_hour, top_margin, 1);
+		line(screen, tm->tm_min,  top_margin + dot_h + dot_sh, 2);
+		line(screen, tm->tm_sec,  top_margin + (dot_h+dot_sh)*2, 3);
+
+		wrefresh(screen);
+		refresh();
+
+		sleep(1);
+	}
+}
+
+
 int
 main(int ac, char **av)
 {
 	struct winsize ws;
 	WINDOW *mainwnd;
 	int frame = 1, ch, border = 1;
+	char *gamename = NULL;
+	void (*gamecallback)() = NULL;
 
-	while ((ch = getopt(ac, av, "vfb")) != -1) {
+	while ((ch = getopt(ac, av, "hvfbg:")) != -1) {
 		switch (ch) {
 		case 'v':
-			fprintf(stderr, "tbclock - Tamentis Binary Clock (c) 2007 Bertrand Janin\n");
+			fprintf(stderr, TBCCOPY);
 			fprintf(stderr, "%s\n", TBCVER);
 			exit(-1);
 		case 'f':
@@ -170,16 +157,30 @@ main(int ac, char **av)
 		case 'b':
 			border = 0;
 			break;
+		case 'g':
+			gamename = optarg;
+			break;
+		case 'h':
 		default:
-			fprintf(stderr, "Usage: %s [-v] [-f]\n", av[0]);
-			fprintf(stderr, "  -f    Disable the frame\n");
-			fprintf(stderr, "  -b    Disable the borders between dots\n");
-			fprintf(stderr, "  -v    Show version\n");
+			fprintf(stderr, "Usage: %s [-v] [-f] [-b] [-g name]\n", 
+					av[0]);
 			exit(-1);
 		}
 	}
 	ac -= optind;
 	av += optind;
+
+	/* Check if we have a gamename */
+	if (gamename != NULL) {
+		frame = 1;
+		border = 1;
+		if (strncmp(gamename, "guessbin", 9) == 0) {
+			gamecallback = game_guessbin;
+		} else {
+			fprintf(stderr, "I never heard of this game!\n");
+			exit(-1);
+		}
+	}
 
 	signal(SIGWINCH, resize);
 
@@ -214,6 +215,8 @@ main(int ac, char **av)
 		init_pair(1, COLOR_BLUE, COLOR_BLUE);
 		init_pair(2, COLOR_RED, COLOR_RED);
 		init_pair(3, COLOR_YELLOW, COLOR_YELLOW);
+		init_pair(4, COLOR_RED, -1);
+		init_pair(5, COLOR_GREEN, -1);
 	}
 
 	/* Calculate sizes and margins... */
@@ -242,19 +245,17 @@ main(int ac, char **av)
 	screen = newwin(height, width, 0, 0);
 	if (frame) {
 		box(screen, ACS_VLINE, ACS_HLINE);
-		mvwprintw(screen, 0, width-15, "tbclock v1.4");
+		mvwprintw(screen, 0, width-15, TBCVER);
 	}
 
-	/* Main loop */
-	for (;;) {
-		if (getch() != -1)
-			break;
-		update_display();
-		sleep(1);
-	}
+	/* Display a game or just the clock */
+	if (gamecallback != NULL)
+		gamecallback();
+	else
+		justclock();
 
 	endwin();
-	printf("Thanks for using tbclock!\n");
+	printf("Thank you for using tbclock!\n");
 
 	return (0);
 }

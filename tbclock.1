@@ -1,0 +1,78 @@
+.\"
+.\" Copyright (c) 2007 Bertrand Janin <tamentis@neopulsar.org>
+.\" All rights reserved.
+.\" 
+.\" Redistribution and use in source and binary forms, with or without
+.\" modification, are permitted provided that the following conditions
+.\" are met:
+.\" 1. Redistributions of source code must retain the above copyright
+.\"    notice, this list of conditions and the following disclaimer.
+.\" 2. Redistributions in binary form must reproduce the above copyright
+.\"    notice, this list of conditions and the following disclaimer in the
+.\"    documentation and/or other materials provided with the distribution.
+.\" 
+.\" THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
+.\" ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+.\" IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+.\" ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
+.\" FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+.\" DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+.\" OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+.\" HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+.\" LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+.\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+.\" SUCH DAMAGE.
+.\"
+.TH TBCLOCK 1 "January 14, 2007" "Bertrand Janin"
+
+.SH NAME
+tbclock \- binary clock with some fun features
+
+.SH SYNOPSIS
+.B tbclock
+[-v] [-b] [-f] [-g gamename]
+
+.SH DESCRIPTION
+.B tbclock
+is a command line clock that displays time in a binary form. Type Ctrl-C
+at any time to quit.
+.PP
+The following command line options are available:
+.TP
+.B -v
+Display version information.
+.TP
+.B -f
+By default, if the terminal is big enough,
+.B tbclock
+draws a frame around the terminal with its version in the top-right corner.
+This option disable this behavior.
+.TP
+.B -b
+By default, if the terminal is big enough,
+.B tbclock
+draws a little space between each blocks to ease the reading, use this
+switch to disable this little space.
+.TP
+.B -g <gamename>
+.B tbclock
+features games related to binary clock reading, each game will
+have its own keyboard bindings, check in the next section for more
+information.
+
+.SH GAMES
+.TP
+.B guessbin
+This game displays a binary time and ask your its decimal equivalent.
+
+.SH AUTHORS
+.B tbclock
+is maintained by Bertrand Janin <tamentis@neopulsar.org>. Please visit
+.I http://tamentis.com/projects/tbclock/
+for more information.
+
+.SH THANKS
+.B Franck
+who got a binary watch and is at the root of the idea and
+.B #debsquad @ irc.oftc.net
+for the support and testing ;)
