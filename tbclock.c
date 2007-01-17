@@ -1,4 +1,4 @@
-/* $Id: tbclock.c,v 1.5 2007-01-14 22:42:46 tamentis Exp $
+/* $Id: tbclock.c,v 1.6 2007-01-17 08:24:58 tamentis Exp $
  *
  * Copyright (c) 2007 Bertrand Janin <tamentis@neopulsar.org>
  * All rights reserved.
@@ -35,7 +35,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-#define TBCVER "tbclock 1.5"
+#define TBCVER "tbclock 1.6"
 #define TBCCOPY TBCVER " - Tamentis Binary Clock (c) 2007 Bertrand Janin\n"
 
 WINDOW *screen;
@@ -48,6 +48,7 @@ int color;
 
 void game_guessbin();
 
+/* dot - Simply print one binary dot (1 or 0, depend of color) */
 void
 dot(WINDOW *screen, int valid, int x, int y, short color)
 {
@@ -68,6 +69,8 @@ dot(WINDOW *screen, int valid, int x, int y, short color)
 }
 
 
+/* line - prints a several 'dot' with the same color, depending of the 
+ * value of hms (time) */
 void
 line(WINDOW *screen, int hms, int y, short color)
 {
@@ -80,6 +83,7 @@ line(WINDOW *screen, int hms, int y, short color)
 }
 
 
+/* resize - called when the terminal is resized... broken for the moment */
 void
 resize(int signal)
 {
@@ -134,6 +138,28 @@ justclock()
 		sleep(1);
 	}
 }
+
+
+/* clear_innerzone - Clear everything inside the borders */
+void
+clear_innerzone(void)
+{
+	char *spc;
+	int i;
+
+	/* Create a string long enough to clean one line */
+	spc = malloc(width - 1);
+	memset(spc, ' ', width - 2);
+	*(spc + width - 1) = 0;
+
+	/* Repeat that all over the place */
+	wbkgdset(screen, COLOR_PAIR(0));
+	for (i = 1; i < height - 1; i++)
+		mvwprintw(screen, i, 1, spc);
+
+	free(spc);
+}
+	
 
 
 int
@@ -208,7 +234,7 @@ main(int ac, char **av)
 	nodelay(mainwnd, TRUE);
 
 
-	/* Prepare the 3 colors */
+	/* Prepare the color palette */
 	start_color();
         if (use_default_colors() != ERR) {
 		init_pair(COLOR_BLACK, -1, -1);
@@ -217,6 +243,8 @@ main(int ac, char **av)
 		init_pair(3, COLOR_YELLOW, COLOR_YELLOW);
 		init_pair(4, COLOR_RED, -1);
 		init_pair(5, COLOR_GREEN, -1);
+		init_pair(6, COLOR_BLACK, COLOR_YELLOW);
+		init_pair(7, COLOR_GREEN, COLOR_GREEN);
 	}
 
 	/* Calculate sizes and margins... */
