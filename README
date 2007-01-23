@@ -18,6 +18,9 @@ make install
 
 Changelog
 ---------
+tbclock-1.7.1
+     - fixed bugs on linux-ppc
+     - fixed guessbin stopping at 2nd time
 tbclock-1.7
      - time management in guessbin has been rewritten, it now works on
        all systems at the same speed.

@@ -1,4 +1,4 @@
-/* $Id: mod_guessbin.c,v 1.1 2007-01-23 13:29:04 tamentis Exp $
+/* $Id: mod_guessbin.c,v 1.2 2007-01-23 14:08:41 tamentis Exp $
  *
  * Copyright (c) 2007 Bertrand Janin <tamentis@neopulsar.org>
  * All rights reserved.
@@ -79,7 +79,7 @@ extern TBC tbc;
 void
 guessbin_score(struct guessbin *g)
 {
-	char c;
+	signed char c;
 	char s_score[32];
 	char s_bonus[32];
 	int l, line = 0;
@@ -250,7 +250,7 @@ guessbin_init()
 	mvwprintw(tbc.screen, tbc.height-1, tbc.width-18, "Ctrl-C to Quit");
 
 	g = malloc(sizeof(struct guessbin));
-	g->q_tot = 2;
+	g->q_tot = 20;
 	g->q_cur = 0;
 	g->q_ok  = 0;
 	g->q_err = 0;

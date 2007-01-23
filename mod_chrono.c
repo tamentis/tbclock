@@ -1,4 +1,4 @@
-/* $Id: mod_chrono.c,v 1.1 2007-01-23 13:29:04 tamentis Exp $
+/* $Id: mod_chrono.c,v 1.2 2007-01-23 14:08:41 tamentis Exp $
  *
  * Copyright (c) 2007 Bertrand Janin <tamentis@neopulsar.org>
  * All rights reserved.
@@ -77,7 +77,7 @@ mod_chrono()
 
 	for (;;) {
 		unsigned int hour, min, sec, dsec;
-		char c;
+		signed char c;
 
 		c = getch();
 
