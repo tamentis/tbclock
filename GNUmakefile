@@ -1,4 +1,4 @@
-# $Id: GNUmakefile,v 1.2 2007-01-14 22:48:36 tamentis Exp $
+# $Id: GNUmakefile,v 1.3 2007-01-23 13:29:04 tamentis Exp $
 #
 # Copyright (c) 2007 Bertrand Janin <tamentis@neopulsar.org>
 # All rights reserved.
@@ -29,7 +29,8 @@ CC=		cc
 OS:=		$(shell uname)
 CFLAGS=		-Wall -O
 LIBFLAGS=	-lncurses
-OBJ=		tbclock.o guessbin.o
+BEAST=		tbclock
+OBJ=		main.o mod_clock.o mod_chrono.o mod_guessbin.o
 MANDIR=		/usr/local/man
 
 ifeq ($(OS),Linux)
@@ -37,21 +38,21 @@ MANDIR=		/usr/share/man
 endif
 
 
-all: tbclock
+all: $(BEAST)
 
-tbclock: tbclock.o guessbin.o
-	$(CC) $(CFLAGS) $(LIBFLAGS) $(OBJ) -o tbclock
+tbclock: $(OBJ)
+	$(CC) $(CFLAGS) $(LIBFLAGS) $(OBJ) -o $(BEAST)
 
 .c.o: 
 	$(CC) -c $(CFLAGS) $<
 
 install:
-	install -m 755 tbclock /usr/local/bin/
-	install -m 644 tbclock.1 $(MANDIR)/man1/
+	install -m 755 $(BEAST) /usr/local/bin/
+	install -m 644 $(BEAST).1 $(MANDIR)/man1/
 
 deinstall:
-	rm -f /usr/local/bin/tbclock
-	rm -f $(MANDIR)/man1/tbclock.1
+	rm -f /usr/local/bin/$(BEAST)
+	rm -f $(MANDIR)/man1/$(BEAST).1
 
 clean:
-	rm -f tbclock $(OBJ)
+	rm -f $(BEAST) $(OBJ)

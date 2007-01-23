@@ -5,7 +5,9 @@ in your terminal (using curses). If you don't know how to read this,
 just check out wikipedia for binary. It doesn't support resizing, there
 is a few lines in the source to do that, but disabled ;) It is known to
 work on Linux, OpenBSD and Darwin/Mac OSX, it's quite simple and should
-work everywhere... It also feature a guessing game.
+work everywhere... It also feature 'guessbin' a little game abour reading
+binary clocks with three levels of difficulty and a timer ('chrono') which
+counts tenth of seconds.
 
 
 Installation
@@ -16,6 +18,16 @@ make install
 
 Changelog
 ---------
+tbclock-1.7
+     - time management in guessbin has been rewritten, it now works on
+       all systems at the same speed.
+     - renamed 'games' to 'modules', option -g is now -m
+     - added a new module: chrono which can counts tenth of seconds
+tbclock-1.6
+     - guessbin now has a time limit for answer, 
+     - a maximum of 20 question,
+     - a difficulty menu,
+     - and a final score page!
 tbclock-1.5
      - Added support for a first game: 'guessbin'.
      - Got a manpage.

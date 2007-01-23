@@ -1,4 +1,5 @@
-.\"
+.\" $Id: tbclock.1,v 1.3 2007-01-23 13:29:04 tamentis Exp $
+.\" 
 .\" Copyright (c) 2007 Bertrand Janin <tamentis@neopulsar.org>
 .\" All rights reserved.
 .\" 
@@ -23,19 +24,20 @@
 .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 .\" SUCH DAMAGE.
 .\"
-.TH TBCLOCK 1 "January 17, 2007" "Bertrand Janin"
+.TH TBCLOCK 1 "January 23, 2007" "Bertrand Janin"
 
 .SH NAME
 tbclock \- binary clock with some fun features
 
 .SH SYNOPSIS
 .B tbclock
-[-v] [-b] [-f] [-g gamename]
+[-v] [-b] [-f] [-m module]
 
 .SH DESCRIPTION
 .B tbclock
 is a command line clock that displays time in a binary form. Type Ctrl-C
-at any time to quit.
+at any time to quit. It features a few modules and games to play with 
+binary time.
 .PP
 The following command line options are available:
 .TP
@@ -54,19 +56,28 @@ By default, if the terminal is big enough,
 draws a little space between each blocks to ease the reading, use this
 switch to disable this little space.
 .TP
-.B -g <gamename>
+.B -m <module>
 .B tbclock
-features games related to binary clock reading, each game will
+features games and tools related to binary clock reading, each module will
 have its own keyboard bindings, check in the next section for more
 information.
 
-.SH GAMES
+.SH MODULES
+.TP
+.B clock
+This is the default module, it displays the current time, hit any
+key to quit.
+.TP
+.B chrono
+This module will run a timer from 0 to whatever you need. You can press
+the Spacebar at any time to pause the timer, and BackSpace to reset it. Any
+other key will quit. This module has an extra binary line that shows tenth of seconds.
 .TP
 .B guessbin
-This game displays a binary time and ask your its decimal equivalent. To
+This game displays a binary time and ask you its decimal equivalent. To
 answer you have to fill the time in this form : "HH:MM:SS". The difficulty
-only changes the answer delay and the amount of points you get.
-
+only changes the answer delay and the amount of points you get. This module
+is not affected by -f or -b.
 
 .SH AUTHORS
 .B tbclock
@@ -79,3 +90,7 @@ for more information.
 who got a binary watch and is at the root of the idea and
 .B #debsquad @ irc.oftc.net
 for the support and testing ;)
+
+.SH "SEE ALSO"
+.BR date (1)
+.br
