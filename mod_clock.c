@@ -1,4 +1,4 @@
-/* $Id: mod_clock.c,v 1.1 2007-01-23 13:29:04 tamentis Exp $
+/* $Id: mod_clock.c,v 1.2 2007-01-23 17:38:20 tamentis Exp $
  *
  * Copyright (c) 2007 Bertrand Janin <tamentis@neopulsar.org>
  * All rights reserved.
@@ -32,8 +32,6 @@
 
 #include "tbclock.h"
 
-#define ERR_TSIZE "The minimal allowed terminal size is 6x3 for 'clock'!"
-
 extern TBC tbc;
 
 /* mod_clock */
@@ -43,15 +41,10 @@ mod_clock()
 	time_t now;
 	struct tm *tm;
 
-	/* terminal is too small, removing frame & border */
-	if (tbc.height < 5 || tbc.width < 8)
-		tbc.opt_frame = tbc.opt_border = 0;
-
-	/* term too small for mod_clock */
-	if (tbc.height < 3 || tbc.width < 6)
-		tbc_fatal(ERR_TSIZE);
-
-	tbc_configure(3, 0);
+	if (tbc.opt_vertical)
+		tbc_configure(4, 6, 0, 6, 4, 8, 6);
+	else
+		tbc_configure(3, 6, 0, 6, 3, 8, 5);
 
 	for (;;) {
 		if (getch() != -1)

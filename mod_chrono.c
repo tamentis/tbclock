@@ -1,4 +1,4 @@
-/* $Id: mod_chrono.c,v 1.2 2007-01-23 14:08:41 tamentis Exp $
+/* $Id: mod_chrono.c,v 1.3 2007-01-23 17:38:20 tamentis Exp $
  *
  * Copyright (c) 2007 Bertrand Janin <tamentis@neopulsar.org>
  * All rights reserved.
@@ -38,8 +38,6 @@
 
 #include "tbclock.h"
 
-#define ERR_TSIZE "The minimal allowed terminal size is 6x4 for 'chrono'!"
-
 extern TBC tbc;
 
 /* returns the number of tenth of seconds since start of program (bigbang) */
@@ -65,13 +63,10 @@ mod_chrono()
 	unsigned long start, elapsed, paused = 0;
 	int pause = 0;
 
-	if (tbc.height < 6 || tbc.width < 8)
-		tbc.opt_frame = tbc.opt_border = 0;
-
-	if (tbc.height < 4 || tbc.width < 6)
-		tbc_fatal(ERR_TSIZE);
-
-	tbc_configure(4, 0);
+	if (tbc.opt_vertical)
+		tbc_configure(4, 7, 0, 6, 4, 8, 6);
+	else
+		tbc_configure(4, 6, 0, 6, 4, 8, 6);
 
 	start = chrono_nds();
 

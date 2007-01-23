@@ -1,4 +1,4 @@
-.\" $Id: tbclock.1,v 1.3 2007-01-23 13:29:04 tamentis Exp $
+.\" $Id: tbclock.1,v 1.4 2007-01-23 17:38:20 tamentis Exp $
 .\" 
 .\" Copyright (c) 2007 Bertrand Janin <tamentis@neopulsar.org>
 .\" All rights reserved.
@@ -31,13 +31,14 @@ tbclock \- binary clock with some fun features
 
 .SH SYNOPSIS
 .B tbclock
-[-v] [-b] [-f] [-m module]
+[-v] [-b] [-f] [-d] [-a] [-m module]
 
 .SH DESCRIPTION
 .B tbclock
 is a command line clock that displays time in a binary form. Type Ctrl-C
 at any time to quit. It features a few modules and games to play with 
-binary time.
+binary time. By default the lines are horizontal and shows hours, minutes
+and seconds, you can switch to a different behaviour with -a, see below.
 .PP
 The following command line options are available:
 .TP
@@ -55,6 +56,15 @@ By default, if the terminal is big enough,
 .B tbclock
 draws a little space between each blocks to ease the reading, use this
 switch to disable this little space.
+.TP
+.B -d
+Do not display the dots where the bit is NUL on the clock.
+.TP
+.B -a
+Switch 
+.B tbclock
+to display binary times in a different fashion, easier for some people,
+one line per 'decimal digit' and vertical.
 .TP
 .B -m <module>
 .B tbclock

@@ -1,4 +1,4 @@
-# $Id: GNUmakefile,v 1.3 2007-01-23 13:29:04 tamentis Exp $
+# $Id: GNUmakefile,v 1.4 2007-01-23 17:38:20 tamentis Exp $
 #
 # Copyright (c) 2007 Bertrand Janin <tamentis@neopulsar.org>
 # All rights reserved.
@@ -43,7 +43,7 @@ all: $(BEAST)
 tbclock: $(OBJ)
 	$(CC) $(CFLAGS) $(LIBFLAGS) $(OBJ) -o $(BEAST)
 
-.c.o: 
+.c.o: tbclock.h
 	$(CC) -c $(CFLAGS) $<
 
 install:

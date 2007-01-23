@@ -1,4 +1,4 @@
-/* $Id: mod_guessbin.c,v 1.2 2007-01-23 14:08:41 tamentis Exp $
+/* $Id: mod_guessbin.c,v 1.3 2007-01-23 17:38:20 tamentis Exp $
  *
  * Copyright (c) 2007 Bertrand Janin <tamentis@neopulsar.org>
  * All rights reserved.
@@ -60,8 +60,6 @@
 #define SCORE_GOOD	"Good shots           +%4u pts"
 #define SCORE_OOPS	"Mistakes             -%4u pts"
 #define SCORE_LINE	"================================"
-
-#define ERR_TSIZE "The minimal allowed terminal size is 53x17 for 'guessbin'!"
 
 
 static char s_diff[4][7] = { "", "Easy", "Normal", "Hard" };
@@ -242,9 +240,6 @@ guessbin_init()
 	char c;
 	int hh, hw;
 
-	if (tbc.width < 53 || tbc.height < 17)
-		tbc_fatal(ERR_TSIZE);
-
 	/* Set up what never moves... */
 	wbkgdset(tbc.screen, COLOR_PAIR(TEXT_DEFAULT));
 	mvwprintw(tbc.screen, tbc.height-1, tbc.width-18, "Ctrl-C to Quit");
@@ -386,8 +381,13 @@ mod_guessbin()
 	unsigned char is[8];
 	unsigned char status[32];
 	int size = 0;
+	unsigned short res = 3;
 
-	tbc_configure(3, -1);
+        if (tbc.opt_vertical)
+		tbc_configure(4, 6, -1, 53, 17, 0, 0);
+	else
+		tbc_configure(3, 6, -1, 53, 18, 0, 0);
+
 	g = guessbin_init();
 
 	/* Game loop */

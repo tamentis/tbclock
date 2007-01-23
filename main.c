@@ -1,4 +1,4 @@
-/* $Id: main.c,v 1.1 2007-01-23 13:29:04 tamentis Exp $
+/* $Id: main.c,v 1.2 2007-01-23 17:38:20 tamentis Exp $
  *
  * Copyright (c) 2007 Bertrand Janin <tamentis@neopulsar.org>
  * All rights reserved.
@@ -40,28 +40,46 @@
 
 #define MSG_UNKNOWNMOD	"I don't know this module (man tbclock).\n"
 #define MSG_THANKS	"Thank you for using tbclock!\n"
+#define USAGE_FMT	"usage: %s [-v] [-f] [-b] [-d] [-a] [-m name]\n"
 
 TBC tbc;
+
+
+/* tbc_refresh */
+void
+tbc_refresh()
+{
+	wrefresh(tbc.screen);
+	refresh();
+}
 
 
 /* tbc_draw_dot - prints one dot if valid */
 void
 tbc_draw_dot(int valid, int x, int y, short color)
 {
-	int i, j;
-	char c[2] = "#";
+	int i;
+	char *s, c = '#';
+
 
 	if (!valid) {
-		color = 0;
-		c[0] = ' ';
+		color = BLOCK_DEFAULT;
+		if (tbc.opt_dots)
+			c = '.';
+		else
+			c = ' ';
 	}
+
+	s = malloc(tbc.dot_w + 1);
+	memset(s, c, tbc.dot_w);
+	s[tbc.dot_w+1] = 0;
 
 	wbkgdset(tbc.screen, COLOR_PAIR(color));
 	for (i = 0; i < tbc.dot_h; i++) {
-		for (j = 0; j < tbc.dot_w; j++) {
-			mvwprintw(tbc.screen, y + i, x + j, c);
-		}
+		mvwprintw(tbc.screen, y + i, x, s);
 	}
+
+	free(s);
 }
 
 
@@ -79,24 +97,48 @@ tbc_draw_line(int hms, int y, short color)
 }
 
 
-/* tbc_refresh */
+/* tbc_draw_line_vert - prints 6 vertical lines (alternative display) */
 void
-tbc_refresh()
+tbc_draw_line_a(int hms, int x, short color, short max)
 {
-	wrefresh(tbc.screen);
-	refresh();
+	int k;
+	unsigned int y;
+
+	for (k = 0; k < 4; k++) {
+		y = tbc.top_margin + (tbc.dot_h + tbc.dot_sh) * (3 - k);
+		if (k < max)
+ 			tbc_draw_dot( hms & (1<<k), x, y, color);
+	}
 }
+
 
 
 /* tbc_draw_time - draw the time, with or without tenth of seconds */
 void
 tbc_draw_time(int res, int hour, int min, int sec, int dsec)
 {
-	tbc_draw_line(hour, 0, BLOCK_BLUE);
-	tbc_draw_line(min, tbc.dot_h + tbc.dot_sh, BLOCK_RED);
-	tbc_draw_line(sec, (tbc.dot_h + tbc.dot_sh) * 2, BLOCK_YELLOW);
-	if (res > 3)
-		tbc_draw_line(dsec, (tbc.dot_h + tbc.dot_sh) * 3, BLOCK_GREEN);
+	int space;
+
+	if (tbc.opt_vertical) {
+		unsigned int ml = tbc.left_margin;
+		space = tbc.dot_sw + tbc.dot_w;
+
+		tbc_draw_line_a(hour / 10, ml,             BLOCK_BLUE,   2);
+		tbc_draw_line_a(hour % 10, ml + space,     BLOCK_BLUE,   4);
+		tbc_draw_line_a(min / 10,  ml + space * 2, BLOCK_RED,    3);
+		tbc_draw_line_a(min % 10,  ml + space * 3, BLOCK_RED,    4);
+		tbc_draw_line_a(sec / 10,  ml + space * 4, BLOCK_YELLOW, 3);
+		tbc_draw_line_a(sec % 10,  ml + space * 5, BLOCK_YELLOW, 4);
+		if (res > 3)
+			tbc_draw_line_a(dsec, ml + space * 6, BLOCK_GREEN, 4);
+	} else {
+		space = tbc.dot_h + tbc.dot_sh;
+		tbc_draw_line(hour, 0, BLOCK_BLUE);
+		tbc_draw_line(min, space, BLOCK_RED);
+		tbc_draw_line(sec, space * 2, BLOCK_YELLOW);
+		if (res > 3)
+			tbc_draw_line(dsec, space * 3, BLOCK_GREEN);
+	}
 }
 
 
@@ -174,6 +216,8 @@ tbc_set_default()
 	tbc.height = 24;
 	tbc.opt_frame = 1;
 	tbc.opt_border = 1;
+	tbc.opt_dots = 1;
+	tbc.opt_vertical = 0;
 }
 
 
@@ -201,13 +245,14 @@ tbc_display_init()
 	/* prepare colors */
 	start_color();
         if (use_default_colors() != ERR) {
-		init_pair(TEXT_DEFAULT, -1, -1);
+		//init_pair(TEXT_DEFAULT, -1, -1);
 		init_pair(BLOCK_RED,	COLOR_RED, COLOR_RED);
 		init_pair(BLOCK_GREEN,	COLOR_GREEN, COLOR_GREEN);
 		init_pair(BLOCK_BLUE,	COLOR_BLUE, COLOR_BLUE);
 		init_pair(BLOCK_YELLOW,	COLOR_YELLOW, COLOR_YELLOW);
 		init_pair(TEXT_RED,	COLOR_RED, -1);
 		init_pair(TEXT_GREEN,	COLOR_GREEN, -1);
+		init_pair(TEXT_BLACK,	COLOR_BLACK, -1);
 		init_pair(BACK_YELLOW,	COLOR_BLACK, COLOR_YELLOW);
 	}
 }
@@ -216,29 +261,41 @@ tbc_display_init()
 /* tbc_configure - setup layout and all those things, will be called from
  * modules, res is the time resolution 3 = seconds, 4 = tenth of seconds */
 void
-tbc_configure(unsigned short res, short y_offset)
+tbc_configure(unsigned short resy, unsigned short resx, short y_offset,
+		unsigned short min_w, unsigned short min_h, 
+		unsigned short pmin_w, unsigned short pmin_h)
 {
+	/* terminal is too small, removing frame & border */
+	if (tbc.height < pmin_h || tbc.width < pmin_w)
+		tbc.opt_frame = tbc.opt_border = 0;
+
+	/* term too small for mod_clock */
+	if (tbc.height < min_h || tbc.width < min_w) {
+		char s_err[72];
+		snprintf(s_err, 72, ERR_TSIZE, min_w, min_h);
+		tbc_fatal(s_err);
+	}
 
 	/* Calculate sizes and margins... */
 	if (tbc.opt_frame) {
-		tbc.dot_h = tbc.height / (res * 2);
+		tbc.dot_h = tbc.height / (resy * 2);
 		if (tbc.dot_h < 1)
 			tbc.dot_h = 1;
 
-		tbc.dot_w = tbc.width / 12; 
+		tbc.dot_w = tbc.width / (resx * 2); 
 		if (tbc.dot_w < 1)
 			tbc.dot_w = 1;
 
 		if (tbc.opt_border) {
-			tbc.dot_sh = tbc.height / (res * 4);
-			tbc.dot_sw = tbc.width / 20;
+			tbc.dot_sh = tbc.height / (resy * 4);
+			tbc.dot_sw = tbc.width / (resx * 3);
 		} else
 			tbc.dot_sh = tbc.dot_sw = 0;
 
-		tbc.top_margin = (tbc.height - res * tbc.dot_h 
-				- tbc.dot_sh * (res - 1)) / 2 + y_offset;
-		tbc.left_margin = (tbc.width - 6 * tbc.dot_w 
-				- tbc.dot_sw * 5) / 2;
+		tbc.top_margin = (tbc.height - resy * tbc.dot_h 
+				- tbc.dot_sh * (resy - 1)) / 2 + y_offset;
+		tbc.left_margin = (tbc.width - resx * tbc.dot_w 
+				- tbc.dot_sw * (resx - 1)) / 2;
 	} else {
 		tbc.dot_h = tbc.height / 3;
 		if (tbc.dot_h < 1)
@@ -278,7 +335,7 @@ main(int ac, char **av)
 
 	tbc_set_default();
 
-	while ((ch = getopt(ac, av, "hvfbg:m:")) != -1) {
+	while ((ch = getopt(ac, av, "hvfbdag:m:")) != -1) {
 		switch (ch) {
 		case 'v':
 			fprintf(stderr, TBCCOPY);
@@ -289,14 +346,19 @@ main(int ac, char **av)
 		case 'b':
 			tbc.opt_border = 0;
 			break;
+		case 'd':
+			tbc.opt_dots = 0;
+			break;
+		case 'a':
+			tbc.opt_vertical = 1;
+			break;
 		case 'g':
 		case 'm':
 			modulename = optarg;
 			break;
 		case 'h':
 		default:
-			fprintf(stderr, "usage: %s [-v] [-f] [-b] [-m name]\n", 
-					av[0]);
+			fprintf(stderr, USAGE_FMT, av[0]);
 			exit(-1);
 		}
 	}

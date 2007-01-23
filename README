@@ -1,56 +1,22 @@
 tbclock (Tamentis Binary Clock)
 ===============================
-This is a quick dirty little app to display a full screen binary clock
-in your terminal (using curses). If you don't know how to read this,
-just check out wikipedia for binary. It doesn't support resizing, there
-is a few lines in the source to do that, but disabled ;) It is known to
-work on Linux, OpenBSD and Darwin/Mac OSX, it's quite simple and should
-work everywhere... It also feature 'guessbin' a little game abour reading
-binary clocks with three levels of difficulty and a timer ('chrono') which
-counts tenth of seconds.
-
+tbclock is a dirty little app that displays a full screen binary clock
+in your terminal (using curses). It doesn't support resizing (yet). It
+is quite simple and features modules like 'guessbin' a little game and
+'chrono' a timer with tenth of seconds. It was a fun way to learn curses ;)
 
 Installation
 ------------
 make
 make install
 
+(Use gmake if you are using a non-gnu operating system)
 
-Changelog
----------
-tbclock-1.7.1
-     - fixed bugs on linux-ppc
-     - fixed guessbin stopping at 2nd time
-tbclock-1.7
-     - time management in guessbin has been rewritten, it now works on
-       all systems at the same speed.
-     - renamed 'games' to 'modules', option -g is now -m
-     - added a new module: chrono which can counts tenth of seconds
-tbclock-1.6
-     - guessbin now has a time limit for answer, 
-     - a maximum of 20 question,
-     - a difficulty menu,
-     - and a final score page!
-tbclock-1.5
-     - Added support for a first game: 'guessbin'.
-     - Got a manpage.
-     - Switched to GNUmakefile for OS dependent reasons.
-tbclock-1.4
-     - Cursor is set invisible.
-tbclock-1.3
-     - You can disable frame and borders between blocks.
-     - Those options can be accessed via command line arguments.
-     - You can now use tbclock in transparent terminals.
-     - If terminal is too small, frame and borders are removed 
-       automagically.
-tbclock-1.2
-     - Should work on any terminal resolution above 8x5
-     - Should also work on monochrome terminals.
-     - Blocks will scale depending of the size of the terminal.
-     - Stop if the terminal is resized (to be fixed...)
-     - Reorganized functions.
 
-The rest
---------
+Notes
+-----
 Thanks to : Franck (Flux/Spir) @ irc.oftc.net for the original idea ;)
 If you have any question, patch ... tamentis (_at_) neopulsar (_dot_) org
+
+
+$Id: README,v 1.5 2007-01-23 17:38:20 tamentis Exp $
