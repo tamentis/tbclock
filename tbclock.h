@@ -1,4 +1,4 @@
-/* $Id: tbclock.h,v 1.2 2007-01-23 17:38:20 tamentis Exp $
+/* $Id: tbclock.h,v 1.3 2007-02-07 11:18:42 tamentis Exp $
  *
  * Copyright (c) 2007 Bertrand Janin <tamentis@neopulsar.org>
  * All rights reserved.
@@ -26,7 +26,7 @@
  *
  */
 
-#define TBCVER "tbclock 1.8"
+#define TBCVER "tbclock 1.9"
 #define TBCCOPY TBCVER " - Tamentis Binary Clock (c) 2007 Bertrand Janin\n"
 #define ERR_TSIZE "The minimal terminal size for this module is %hhux%hhu."
 
@@ -48,6 +48,8 @@
 #define KB_BACKSPACE	0x7F
 #define KB_RETURN	0x0A
 #define KB_CLEAR	0x15
+#define KB_H		0x68
+#define KB_R		0x72
 
 /* data types */
 typedef struct _tbclock_data {
@@ -69,6 +71,7 @@ typedef struct _tbclock_data {
 	int opt_border;
 	int opt_dots;
 	int opt_vertical;
+	int opt_helper;
 } TBC;
 
 /* tbclock functions */
@@ -77,6 +80,8 @@ void tbc_refresh();
 void tbc_fatal(char *);
 void tbc_clear_innerzone(void);
 void tbc_draw_time(int, int, int, int, int);
+void tbc_next_help_value();
+
 
 /* modules */
 void mod_guessbin();

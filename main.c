@@ -1,4 +1,4 @@
-/* $Id: main.c,v 1.2 2007-01-23 17:38:20 tamentis Exp $
+/* $Id: main.c,v 1.3 2007-02-07 11:18:42 tamentis Exp $
  *
  * Copyright (c) 2007 Bertrand Janin <tamentis@neopulsar.org>
  * All rights reserved.
@@ -40,7 +40,7 @@
 
 #define MSG_UNKNOWNMOD	"I don't know this module (man tbclock).\n"
 #define MSG_THANKS	"Thank you for using tbclock!\n"
-#define USAGE_FMT	"usage: %s [-v] [-f] [-b] [-d] [-a] [-m name]\n"
+#define USAGE_FMT	"usage: %s [-v] [-f] [-b] [-d] [-a] [-H] [-m name]\n"
 
 TBC tbc;
 
@@ -112,17 +112,117 @@ tbc_draw_line_a(int hms, int x, short color, short max)
 }
 
 
+/* tbc_next_help_value - rotate through different reading helps */
+void
+tbc_next_help_value()
+{
+	int space = tbc.dot_h + tbc.dot_sh;
+	unsigned int tm, lm;
+	unsigned bm = 3;
+
+	if (tbc.height < 6)
+		bm = 1;
+	else if (tbc.height < 15)
+		bm = 2;
+
+	tm = tbc.top_margin + tbc.dot_h / 2;
+	lm = tbc.width - tbc.left_margin + tbc.left_margin / 2 - 1;
+
+	if (tbc.opt_helper > 2)
+		tbc.opt_helper = 0;
+	else    
+		tbc.opt_helper++;
+
+	wbkgdset(tbc.screen, COLOR_PAIR(TEXT_DEFAULT));
+	tbc_clear_innerzone();
+
+}
+
+
+/* tbc_draw_helpers - draw the currently selected reading help */
+void
+tbc_draw_helpers(int res, int hour, int min, int sec, int dsec)
+{
+	int space;
+	char st[12];
+
+	/* display bottom (full) helper */
+	if (tbc.height > 3 && tbc.opt_helper > 1) {
+		unsigned bm = 3;
+		unsigned i;
+		
+		/* worry about terminal size */
+		if (tbc.height < 6)
+			bm = 1;
+		else if (tbc.height < 15)
+			bm = 2;
+
+		/* do we need to show tenth of sec ? */
+		if (res > 3)
+			i = snprintf(st, 12, "%02u:%02u:%02u:%02d", hour, min, 
+					sec, dsec);
+		else
+			i = snprintf(st, 9, "%02u:%02u:%02u", hour, min, sec);
+
+		wbkgdset(tbc.screen, COLOR_PAIR(TEXT_DEFAULT));
+		mvprintw(tbc.height - bm, tbc.width / 2 - (i / 2), st);
+	}
+
+	/* display side (by line) helper (normal horizontal lines) */
+	if (!tbc.opt_vertical && tbc.width > 11 && 
+			(tbc.opt_helper == 1 || tbc.opt_helper > 2)) {
+		unsigned int tm, lm;
+
+		tm = tbc.top_margin + tbc.dot_h / 2;
+		lm = tbc.width - tbc.left_margin + tbc.left_margin / 2 - 1;
+		space = tbc.dot_h + tbc.dot_sh;
+
+		wbkgdset(tbc.screen, COLOR_PAIR(TEXT_DEFAULT));
+		snprintf(st, 3, "%02u", hour);
+		mvwprintw(tbc.screen, tm, lm, st);
+		snprintf(st, 3, "%02u", min);
+		mvwprintw(tbc.screen, tm + space, lm, st);
+		snprintf(st, 3, "%02u", sec);
+		mvwprintw(tbc.screen, tm + space * 2, lm, st);
+		if (res > 3) {
+			snprintf(st, 3, "%02u", dsec);
+			mvwprintw(tbc.screen, tm + space * 3, lm, st);
+		}
+	}
+
+	/* display bottom (by digit) helper (alternative vertical lines) */
+	if (tbc.opt_vertical && tbc.width > 11 && 
+			(tbc.opt_helper == 1 || tbc.opt_helper > 2)) {
+		unsigned int tm, lm;
+
+		tm = tbc.top_margin + (tbc.dot_h + tbc.dot_sh) * 4;
+		lm = tbc.left_margin;
+		space = (tbc.dot_sw + tbc.dot_w) * 2;
+
+		wbkgdset(tbc.screen, COLOR_PAIR(TEXT_DEFAULT));
+		snprintf(st, 3, "%02u", hour);
+		mvwprintw(tbc.screen, tm, lm, st);
+		snprintf(st, 3, "%02u", min);
+		mvwprintw(tbc.screen, tm, lm + space, st);
+		snprintf(st, 3, "%02u", sec);
+		mvwprintw(tbc.screen, tm, lm + space * 2, st);
+		if (res > 3) {
+			snprintf(st, 3, "%02u", dsec);
+			mvwprintw(tbc.screen, tm, lm + space * 3, st);
+		}
+	}
+}
+
 
 /* tbc_draw_time - draw the time, with or without tenth of seconds */
 void
 tbc_draw_time(int res, int hour, int min, int sec, int dsec)
 {
 	int space;
+	unsigned int ml = tbc.left_margin;
 
 	if (tbc.opt_vertical) {
-		unsigned int ml = tbc.left_margin;
 		space = tbc.dot_sw + tbc.dot_w;
-
 		tbc_draw_line_a(hour / 10, ml,             BLOCK_BLUE,   2);
 		tbc_draw_line_a(hour % 10, ml + space,     BLOCK_BLUE,   4);
 		tbc_draw_line_a(min / 10,  ml + space * 2, BLOCK_RED,    3);
@@ -139,6 +239,8 @@ tbc_draw_time(int res, int hour, int min, int sec, int dsec)
 		if (res > 3)
 			tbc_draw_line(dsec, space * 3, BLOCK_GREEN);
 	}
+
+	tbc_draw_helpers(res, hour, min, sec, dsec);
 }
 
 
@@ -218,6 +320,7 @@ tbc_set_default()
 	tbc.opt_border = 1;
 	tbc.opt_dots = 1;
 	tbc.opt_vertical = 0;
+	tbc.opt_helper = 0;
 }
 
 
@@ -335,7 +438,7 @@ main(int ac, char **av)
 
 	tbc_set_default();
 
-	while ((ch = getopt(ac, av, "hvfbdag:m:")) != -1) {
+	while ((ch = getopt(ac, av, "hHvfbdag:m:")) != -1) {
 		switch (ch) {
 		case 'v':
 			fprintf(stderr, TBCCOPY);
@@ -351,6 +454,9 @@ main(int ac, char **av)
 			break;
 		case 'a':
 			tbc.opt_vertical = 1;
+			break;
+		case 'H':
+			tbc.opt_helper++;
 			break;
 		case 'g':
 		case 'm':

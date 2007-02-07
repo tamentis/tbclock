@@ -1,3 +1,7 @@
+tbclock-1.9
+ - players/users can now display a decimal help in different form using
+   'h' key in 'clock' and 'chrono' or with -H on command line. 
+ - you can now review your answers in guessbin using 'r' at score table.
 tbclock-1.8
  - dots appears on NUL bits (can be switched off with -b).
  - added '-a' option to switch display style to vertical

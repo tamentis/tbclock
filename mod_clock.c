@@ -1,4 +1,4 @@
-/* $Id: mod_clock.c,v 1.2 2007-01-23 17:38:20 tamentis Exp $
+/* $Id: mod_clock.c,v 1.3 2007-02-07 11:18:42 tamentis Exp $
  *
  * Copyright (c) 2007 Bertrand Janin <tamentis@neopulsar.org>
  * All rights reserved.
@@ -40,6 +40,7 @@ mod_clock()
 {
 	time_t now;
 	struct tm *tm;
+	char c;
 
 	if (tbc.opt_vertical)
 		tbc_configure(4, 6, 0, 6, 4, 8, 6);
@@ -47,8 +48,12 @@ mod_clock()
 		tbc_configure(3, 6, 0, 6, 3, 8, 5);
 
 	for (;;) {
-		if (getch() != -1)
-			break;
+		if ((c = getch()) != -1) {
+			if (c == KB_H)
+				tbc_next_help_value();
+			else
+				break;
+		}
 
 		now = time(NULL);
 		tm = localtime(&now);

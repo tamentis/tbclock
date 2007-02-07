@@ -1,4 +1,4 @@
-.\" $Id: tbclock.1,v 1.4 2007-01-23 17:38:20 tamentis Exp $
+.\" $Id: tbclock.1,v 1.5 2007-02-07 11:18:42 tamentis Exp $
 .\" 
 .\" Copyright (c) 2007 Bertrand Janin <tamentis@neopulsar.org>
 .\" All rights reserved.
@@ -24,14 +24,14 @@
 .\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 .\" SUCH DAMAGE.
 .\"
-.TH TBCLOCK 1 "January 23, 2007" "Bertrand Janin"
+.TH TBCLOCK 1 "February 7, 2007" "Bertrand Janin"
 
 .SH NAME
 tbclock \- binary clock with some fun features
 
 .SH SYNOPSIS
 .B tbclock
-[-v] [-b] [-f] [-d] [-a] [-m module]
+[-v] [-b] [-f] [-d] [-a] [-H] [-m module]
 
 .SH DESCRIPTION
 .B tbclock
@@ -66,6 +66,13 @@ Switch
 to display binary times in a different fashion, easier for some people,
 one line per 'decimal digit' and vertical.
 .TP
+.B -H
+Switch 
+.B tbclock
+to display decimal helpers. One -H will display side help, -HH will display
+a decimal clock under the binary clock, -HHH will display both. You can
+alternatively use the 'h' key to switch between modes.
+.TP
 .B -m <module>
 .B tbclock
 features games and tools related to binary clock reading, each module will
@@ -75,19 +82,22 @@ information.
 .SH MODULES
 .TP
 .B clock
-This is the default module, it displays the current time, hit any
-key to quit.
+This is the default module, it displays the current time. The 'h' key
+will switch between different decimal hint modes. Any other key will
+quit.
 .TP
 .B chrono
 This module will run a timer from 0 to whatever you need. You can press
 the Spacebar at any time to pause the timer, and BackSpace to reset it. Any
-other key will quit. This module has an extra binary line that shows tenth of seconds.
+other key will quit. This module has an extra binary line that shows tenth
+of seconds, this might makes some slow terminal flicker. 'h' key will
+switch on/off different reading helps.
 .TP
 .B guessbin
 This game displays a binary time and ask you its decimal equivalent. To
 answer you have to fill the time in this form : "HH:MM:SS". The difficulty
 only changes the answer delay and the amount of points you get. This module
-is not affected by -f or -b.
+is not affected by -f, -b or -H.
 
 .SH AUTHORS
 .B tbclock
