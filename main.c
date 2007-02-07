@@ -1,4 +1,4 @@
-/* $Id: main.c,v 1.3 2007-02-07 11:18:42 tamentis Exp $
+/* $Id: main.c,v 1.4 2007-02-07 11:25:24 tamentis Exp $
  *
  * Copyright (c) 2007 Bertrand Janin <tamentis@neopulsar.org>
  * All rights reserved.
@@ -72,7 +72,7 @@ tbc_draw_dot(int valid, int x, int y, short color)
 
 	s = malloc(tbc.dot_w + 1);
 	memset(s, c, tbc.dot_w);
-	s[tbc.dot_w+1] = 0;
+	s[tbc.dot_w] = 0;
 
 	wbkgdset(tbc.screen, COLOR_PAIR(color));
 	for (i = 0; i < tbc.dot_h; i++) {
@@ -116,7 +116,6 @@ tbc_draw_line_a(int hms, int x, short color, short max)
 void
 tbc_next_help_value()
 {
-	int space = tbc.dot_h + tbc.dot_sh;
 	unsigned int tm, lm;
 	unsigned bm = 3;
 

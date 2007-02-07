@@ -1,4 +1,4 @@
-/* $Id: mod_guessbin.c,v 1.4 2007-02-07 11:18:42 tamentis Exp $
+/* $Id: mod_guessbin.c,v 1.5 2007-02-07 11:25:24 tamentis Exp $
  *
  * Copyright (c) 2007 Bertrand Janin <tamentis@neopulsar.org>
  * All rights reserved.
@@ -459,7 +459,7 @@ guessbin_correct()
 
 /* guessbin_timeout - what to do when player didn't answer in time */
 void
-guessbin_timeout(char *is, int size)
+guessbin_timeout(unsigned char *is, int size)
 {
 	wbkgdset(tbc.screen, COLOR_PAIR(TEXT_RED));
 	mvwprintw(tbc.screen, tbc.height - 4, QUESTION_LEFT, COMMENT_TIMEOUT);
