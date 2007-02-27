@@ -1,4 +1,6 @@
-# $Id: GNUmakefile,v 1.5 2007-02-27 09:28:53 tamentis Exp $
+#!/bin/sh
+#
+# $Id: configure,v 1.1 2007-02-27 10:58:41 tamentis Exp $
 #
 # Copyright (c) 2007 Bertrand Janin <tamentis@neopulsar.org>
 # All rights reserved.
@@ -25,34 +27,42 @@
 # SUCH DAMAGE.
 # 
 
+OS=`uname`
+
+case $OS in
+Linux)
+	MANDIR=/usr/share/man
+	;;
+*)
+	MANDIR=/usr/local/man
+	;;
+esac
+
+cat > Makefile << EOF
 CC=		cc
-OS:=		$(shell uname)
 CFLAGS=		-Wall -O
 LIBFLAGS=	-lncurses
 BEAST=		tbclock
 OBJ=		main.o draw.o mod_clock.o mod_chrono.o mod_guessbin.o
-MANDIR=		/usr/local/man
+MANDIR=		${MANDIR}
 
-ifeq ($(OS),Linux)
-MANDIR=		/usr/share/man
-endif
+all: \$(BEAST)
 
-
-all: $(BEAST)
-
-tbclock: $(OBJ)
-	$(CC) $(CFLAGS) $(LIBFLAGS) $(OBJ) -o $(BEAST)
+tbclock: \$(OBJ)
+	\$(CC) \$(CFLAGS) \$(LIBFLAGS) \$(OBJ) -o \$(BEAST)
 
 .c.o: tbclock.h
-	$(CC) -c $(CFLAGS) $<
+	\$(CC) -c \$(CFLAGS) $<
 
 install:
-	install -m 755 $(BEAST) /usr/local/bin/
-	install -m 644 $(BEAST).1 $(MANDIR)/man1/
+	install -m 755 \$(BEAST) /usr/local/bin/
+	install -m 644 \$(BEAST).1 \$(MANDIR)/man1/
 
 deinstall:
-	rm -f /usr/local/bin/$(BEAST)
-	rm -f $(MANDIR)/man1/$(BEAST).1
+	rm -f /usr/local/bin/\$(BEAST)
+	rm -f \$(MANDIR)/man1/\$(BEAST).1
 
 clean:
-	rm -f $(BEAST) $(OBJ)
+	rm -f \$(BEAST) \$(OBJ)
+
+EOF

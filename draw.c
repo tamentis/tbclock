@@ -1,4 +1,4 @@
-/* $Id: draw.c,v 1.2 2007-02-27 09:53:35 tamentis Exp $
+/* $Id: draw.c,v 1.3 2007-02-27 10:58:41 tamentis Exp $
  *
  * Copyright (c) 2007 Bertrand Janin <tamentis@neopulsar.org>
  * All rights reserved.
@@ -197,6 +197,7 @@ tbc_draw_time(int res, int hour, int min, int sec, int dsec)
 
 	tbc_draw_helpers(res, hour, min, sec, dsec);
 
+	move(0, 0);
 }
 
 

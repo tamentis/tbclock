@@ -1,4 +1,4 @@
-/* $Id: main.c,v 1.7 2007-02-27 10:36:23 tamentis Exp $
+/* $Id: main.c,v 1.8 2007-02-27 10:58:41 tamentis Exp $
  *
  * Copyright (c) 2007 Bertrand Janin <tamentis@neopulsar.org>
  * All rights reserved.
@@ -26,6 +26,7 @@
  */
 
 
+#include <time.h>
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
