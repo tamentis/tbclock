@@ -1,4 +1,4 @@
-/* $Id: mod_guessbin.c,v 1.7 2007-02-27 09:53:35 tamentis Exp $
+/* $Id: mod_guessbin.c,v 1.8 2007-02-27 10:36:23 tamentis Exp $
  *
  * Copyright (c) 2007 Bertrand Janin <tamentis@neopulsar.org>
  * All rights reserved.
@@ -213,7 +213,7 @@ guessbin_score()
 		if (c == KB_R) {
 			tbc_clear();
 			mode = mode == 0 ? 1 : 0;
-		} else if (c != -1)
+		} else if (c > 0)
 			break;
 
 		if (mode == 1)
@@ -344,7 +344,7 @@ struct guessbin *
 guessbin_init() 
 {
 	struct guessbin *g;
-	char c;
+	signed char c;
 	int hh, hw;
 
 	/* Set up what never moves... */
@@ -372,14 +372,11 @@ guessbin_init()
 	for (;;) {
 		c = getch();
 
-		switch (c) {
-		case KB_LEFT:
+		if (c == KB_LEFT)
 			guessbin_menu_diff(g->diff > 1 ? --(g->diff) : g->diff);
-			break;
-		case KB_RIGHT:
+		else if (c == KB_RIGHT)
 			guessbin_menu_diff(g->diff < 3 ? ++(g->diff) : g->diff);
-			break;
-		case KB_RETURN:
+		else if (c == KB_RETURN) {
 			tbc_clear();
 			break;
 		}
@@ -502,10 +499,11 @@ guessbin_clearprompt(int *size)
 void
 mod_guessbin()
 {
-	char c;
 	unsigned char is[8];
 	unsigned char status[32];
+	signed char c;
 	int size = 0;
+	time_t now;
 
 	tbc.res_x = 6;
 
@@ -524,8 +522,6 @@ mod_guessbin()
 	mvwprintw(tbc.screen, tbc.height - 3, QUESTION_LEFT, PROMPT_TEXT);
 	guessbin_shuffle();
 	for (;;) {
-		time_t now;
-
 		c = getch();
 		now = time(NULL);
 

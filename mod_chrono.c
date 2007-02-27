@@ -1,4 +1,4 @@
-/* $Id: mod_chrono.c,v 1.6 2007-02-27 09:53:35 tamentis Exp $
+/* $Id: mod_chrono.c,v 1.7 2007-02-27 10:36:23 tamentis Exp $
  *
  * Copyright (c) 2007 Bertrand Janin <tamentis@neopulsar.org>
  * All rights reserved.
@@ -110,7 +110,7 @@ mod_chrono()
 				tbc.res_x = 7;
 			}
 			tbc_configure();
-		} else if (c != -1)
+		} else if (c > 0)
 			return;
 
 		if (!pause) {

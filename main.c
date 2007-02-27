@@ -1,4 +1,4 @@
-/* $Id: main.c,v 1.6 2007-02-27 09:53:35 tamentis Exp $
+/* $Id: main.c,v 1.7 2007-02-27 10:36:23 tamentis Exp $
  *
  * Copyright (c) 2007 Bertrand Janin <tamentis@neopulsar.org>
  * All rights reserved.
@@ -169,7 +169,8 @@ main(int ac, char **av)
 			break;
 		case 'g':
 		case 'm':
-			strlcpy(modulename, optarg, 9);
+			strncpy(modulename, optarg, 9);
+			modulename[8] = 0;
 			break;
 		case 'H':
 			SET_COLOR(tbc.col_h);

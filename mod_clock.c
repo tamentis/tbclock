@@ -1,4 +1,4 @@
-/* $Id: mod_clock.c,v 1.5 2007-02-27 09:53:35 tamentis Exp $
+/* $Id: mod_clock.c,v 1.6 2007-02-27 10:36:23 tamentis Exp $
  *
  * Copyright (c) 2007 Bertrand Janin <tamentis@neopulsar.org>
  * All rights reserved.
@@ -51,7 +51,7 @@ mod_clock()
 	tbc_configure();
 
 	for (;;) {
-		if ((c = getch()) != -1) {
+		if ((c = getch()) > 0) {
 			switch (c) {
 				case KB_H:
 					tbc_next_help_value();
