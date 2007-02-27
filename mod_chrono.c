@@ -1,4 +1,4 @@
-/* $Id: mod_chrono.c,v 1.5 2007-02-27 09:28:53 tamentis Exp $
+/* $Id: mod_chrono.c,v 1.6 2007-02-27 09:53:35 tamentis Exp $
  *
  * Copyright (c) 2007 Bertrand Janin <tamentis@neopulsar.org>
  * All rights reserved.
@@ -38,7 +38,7 @@
 
 #include "tbclock.h"
 
-extern TBC tbc;
+extern struct tbclock_data tbc;
 
 /* returns the number of tenth of seconds since start of program (bigbang) */
 unsigned long

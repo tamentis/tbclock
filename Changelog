@@ -1,5 +1,10 @@
 tbclock-1.10
  - fixed signedness in mod_clock for linux/ppc
+ - fixed display bug in small terms.
+ - resizing is now working
+ - you can change display mode on the fly with 'a' in "clock" and "chrono"
+ - command line color selection (-H, -M,...), thanks Olivier Regnier
+ - decimal help is now triggered with -e instead of -H.
 tbclock-1.9
  - players/users can now display a decimal help in different form using
    'h' key in 'clock' and 'chrono' or with -H on command line. 

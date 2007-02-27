@@ -1,4 +1,4 @@
-/* $Id: mod_clock.c,v 1.4 2007-02-27 09:28:53 tamentis Exp $
+/* $Id: mod_clock.c,v 1.5 2007-02-27 09:53:35 tamentis Exp $
  *
  * Copyright (c) 2007 Bertrand Janin <tamentis@neopulsar.org>
  * All rights reserved.
@@ -32,7 +32,7 @@
 
 #include "tbclock.h"
 
-extern TBC tbc;
+extern struct tbclock_data tbc;
 
 /* mod_clock */
 void
@@ -78,7 +78,7 @@ mod_clock()
 
 		tbc_draw_time(3, tm->tm_hour, tm->tm_min, tm->tm_sec, 0);
 
-		tbc_refresh();
+		refresh();
 		usleep(10000);
 	}
 }

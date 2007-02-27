@@ -1,4 +1,4 @@
-/* $Id: main.c,v 1.5 2007-02-27 09:28:53 tamentis Exp $
+/* $Id: main.c,v 1.6 2007-02-27 09:53:35 tamentis Exp $
  *
  * Copyright (c) 2007 Bertrand Janin <tamentis@neopulsar.org>
  * All rights reserved.
@@ -35,7 +35,7 @@
 #include "tbclock.h"
 
 
-TBC tbc;
+struct tbclock_data tbc;
 
 
 /* tbc_next_help_value - rotate through different reading helps */

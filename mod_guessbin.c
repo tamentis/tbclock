@@ -1,4 +1,4 @@
-/* $Id: mod_guessbin.c,v 1.6 2007-02-27 09:28:53 tamentis Exp $
+/* $Id: mod_guessbin.c,v 1.7 2007-02-27 09:53:35 tamentis Exp $
  *
  * Copyright (c) 2007 Bertrand Janin <tamentis@neopulsar.org>
  * All rights reserved.
@@ -97,7 +97,7 @@ struct history {
 
 
 /* global & extern vars */
-extern TBC tbc;
+extern struct tbclock_data tbc;
 
 static char s_diff[4][7] = { "", "Easy", "Normal", "Hard" };
 struct history history[NUMOFQUEST];
@@ -379,7 +379,7 @@ guessbin_init()
 		case KB_RIGHT:
 			guessbin_menu_diff(g->diff < 3 ? ++(g->diff) : g->diff);
 			break;
-		case KB_ENTER:
+		case KB_RETURN:
 			tbc_clear();
 			break;
 		}
