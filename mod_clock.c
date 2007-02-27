@@ -1,4 +1,4 @@
-/* $Id: mod_clock.c,v 1.3 2007-02-07 11:18:42 tamentis Exp $
+/* $Id: mod_clock.c,v 1.4 2007-02-27 09:28:53 tamentis Exp $
  *
  * Copyright (c) 2007 Bertrand Janin <tamentis@neopulsar.org>
  * All rights reserved.
@@ -40,20 +40,38 @@ mod_clock()
 {
 	time_t now;
 	struct tm *tm;
-	char c;
+	signed char c;
 
+	/* base configuration */
+	tbc.res_x = 6;
 	if (tbc.opt_vertical)
-		tbc_configure(4, 6, 0, 6, 4, 8, 6);
+		tbc.res_y = 4;
 	else
-		tbc_configure(3, 6, 0, 6, 3, 8, 5);
+		tbc.res_y = 3;
+	tbc_configure();
 
 	for (;;) {
 		if ((c = getch()) != -1) {
-			if (c == KB_H)
-				tbc_next_help_value();
-			else
-				break;
+			switch (c) {
+				case KB_H:
+					tbc_next_help_value();
+					tbc_configure();
+					break;
+				case KB_A:
+					if (tbc.opt_vertical) {
+						tbc.opt_vertical = 0;
+						tbc.res_y = 3;
+					} else {
+						tbc.opt_vertical = 1;
+						tbc.res_y = 4;
+					}
+					tbc_configure();
+					break;
+				default:
+					return;
+			}
 		}
+
 
 		now = time(NULL);
 		tm = localtime(&now);
@@ -61,7 +79,6 @@ mod_clock()
 		tbc_draw_time(3, tm->tm_hour, tm->tm_min, tm->tm_sec, 0);
 
 		tbc_refresh();
-
 		usleep(10000);
 	}
 }

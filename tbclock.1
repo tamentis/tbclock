@@ -1,4 +1,4 @@
-.\" $Id: tbclock.1,v 1.5 2007-02-07 11:18:42 tamentis Exp $
+.\" $Id: tbclock.1,v 1.6 2007-02-27 09:28:53 tamentis Exp $
 .\" 
 .\" Copyright (c) 2007 Bertrand Janin <tamentis@neopulsar.org>
 .\" All rights reserved.
@@ -31,16 +31,17 @@ tbclock \- binary clock with some fun features
 
 .SH SYNOPSIS
 .B tbclock
-[-v] [-b] [-f] [-d] [-a] [-H] [-m module]
+[-abdefvh] [-HMST color] [-m module]
 
 .SH DESCRIPTION
 .B tbclock
-is a command line clock that displays time in a binary form. Type Ctrl-C
-at any time to quit. It features a few modules and games to play with 
-binary time. By default the lines are horizontal and shows hours, minutes
-and seconds, you can switch to a different behaviour with -a, see below.
+is a fullscreen terminal clock that displays time in a binary fashion or
+another. It features a few modules and games to play with binary
+displayed time. By default the lines are horizontal and shows hours,
+minutes and seconds, you can switch to a different behaviour with -a,
+see below.
 .PP
-The following command line options are available:
+The options are as follows:
 .TP
 .B -v
 Display version information.
@@ -66,7 +67,7 @@ Switch
 to display binary times in a different fashion, easier for some people,
 one line per 'decimal digit' and vertical.
 .TP
-.B -H
+.B -e
 Switch 
 .B tbclock
 to display decimal helpers. One -H will display side help, -HH will display
@@ -78,20 +79,32 @@ alternatively use the 'h' key to switch between modes.
 features games and tools related to binary clock reading, each module will
 have its own keyboard bindings, check in the next section for more
 information.
+.TP
+.B -H, -M, -S, -T <color>
+Those options changes the color of blocks. It takes a numeric option between
+0 and 7, those numbers are directly copied from ncurses.h, here are their
+meaning :
+     0: Black         4: Blue
+     1: Red           5: Magenta
+     2: Green         6: Cyan
+     3: Yellow        7: White
+
 
 .SH MODULES
 .TP
 .B clock
 This is the default module, it displays the current time. The 'h' key
-will switch between different decimal hint modes. Any other key will
-quit.
+will switch between different decimal hint modes. 'a' key will switch 
+between the two different display modes 'vertical' and 'horizontal'. Any
+other key will quit.
 .TP
 .B chrono
 This module will run a timer from 0 to whatever you need. You can press
 the Spacebar at any time to pause the timer, and BackSpace to reset it. Any
 other key will quit. This module has an extra binary line that shows tenth
 of seconds, this might makes some slow terminal flicker. 'h' key will
-switch on/off different reading helps.
+switch on/off different reading helps, 'a' will switch between display
+modes.
 .TP
 .B guessbin
 This game displays a binary time and ask you its decimal equivalent. To
@@ -107,7 +120,11 @@ for more information.
 
 .SH THANKS
 .B Franck
-who got a binary watch and is at the root of the idea and
+who got a binary watch and is at the root of the idea,
+.B Olivier Regnier
+for the color options idea and bug reports,
+.B Andrew Pantyukhin
+for the FreeBSD port,
 .B #debsquad @ irc.oftc.net
 for the support and testing ;)
 

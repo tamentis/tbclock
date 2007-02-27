@@ -1,4 +1,4 @@
-# $Id: GNUmakefile,v 1.4 2007-01-23 17:38:20 tamentis Exp $
+# $Id: GNUmakefile,v 1.5 2007-02-27 09:28:53 tamentis Exp $
 #
 # Copyright (c) 2007 Bertrand Janin <tamentis@neopulsar.org>
 # All rights reserved.
@@ -30,7 +30,7 @@ OS:=		$(shell uname)
 CFLAGS=		-Wall -O
 LIBFLAGS=	-lncurses
 BEAST=		tbclock
-OBJ=		main.o mod_clock.o mod_chrono.o mod_guessbin.o
+OBJ=		main.o draw.o mod_clock.o mod_chrono.o mod_guessbin.o
 MANDIR=		/usr/local/man
 
 ifeq ($(OS),Linux)

@@ -1,4 +1,4 @@
-/* $Id: tbclock.h,v 1.3 2007-02-07 11:18:42 tamentis Exp $
+/* $Id: tbclock.h,v 1.4 2007-02-27 09:28:53 tamentis Exp $
  *
  * Copyright (c) 2007 Bertrand Janin <tamentis@neopulsar.org>
  * All rights reserved.
@@ -26,9 +26,14 @@
  *
  */
 
-#define TBCVER "tbclock 1.9"
-#define TBCCOPY TBCVER " - Tamentis Binary Clock (c) 2007 Bertrand Janin\n"
-#define ERR_TSIZE "The minimal terminal size for this module is %hhux%hhu."
+
+/* some text constants */
+#define TBCVER		"tbclock 1.10"
+#define TBCCOPY TBCVER	" - Tamentis Binary Clock (c) 2007 Bertrand Janin\n"
+#define ERR_TSIZE	"The minimal terminal size for this module is %hhux%hhu."
+#define MSG_UNKNOWNMOD	"I don't know this module (man tbclock).\n"
+#define USAGE_FMT	"usage: %s [-abdefhv] [-HMST color] [-m name]\n"
+
 
 /* color definitions */
 #define BLOCK_DEFAULT	0
@@ -42,16 +47,23 @@
 #define TEXT_BLACK	12
 #define BACK_DEFAULT	0
 #define BACK_YELLOW	20
+#define BLOCK_HOUR	30
+#define BLOCK_MINUTE	31
+#define BLOCK_SECOND	32
+#define BLOCK_TENTH	33
 
 /* keyboard definitions */
 #define KB_SPACE	0x20
 #define KB_BACKSPACE	0x7F
 #define KB_RETURN	0x0A
 #define KB_CLEAR	0x15
+#define KB_LEFT		0x44
+#define KB_RIGHT	0x43
+#define KB_A		0x61
 #define KB_H		0x68
 #define KB_R		0x72
 
-/* data types */
+/* main and only data type */
 typedef struct _tbclock_data {
 	WINDOW *screen;
 	int now_sec;
@@ -61,29 +73,35 @@ typedef struct _tbclock_data {
 	int left_margin;
 	int dot_w;
 	int dot_h;
-	int dot_sw;
-	int dot_sh;
+	int res_x;
+	int res_y;
 	int height;
 	int width;
 	int color;
 	time_t bigbang;
+	int org_frame;
 	int opt_frame;
+	int org_border;
 	int opt_border;
 	int opt_dots;
 	int opt_vertical;
 	int opt_helper;
+	int col_h;
+	int col_m;
+	int col_s;
+	int col_t;
 } TBC;
 
-/* tbclock functions */
-void tbc_configure(unsigned short, unsigned short, short, unsigned short, unsigned short, unsigned short, unsigned short);
-void tbc_refresh();
-void tbc_fatal(char *);
-void tbc_clear_innerzone(void);
-void tbc_draw_time(int, int, int, int, int);
+/* prototypes for main.c */
+void tbc_configure(void);
 void tbc_next_help_value();
 
+/* prototypes for draw.c */
+void tbc_display_init(void);
+void tbc_clear(void);
+void tbc_draw_time(int, int, int, int, int);
 
-/* modules */
+/* prototypes for mod_*.c */
 void mod_guessbin();
 void mod_clock();
 void mod_chrono();

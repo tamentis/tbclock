@@ -1,4 +1,4 @@
-/* $Id: mod_guessbin.c,v 1.5 2007-02-07 11:25:24 tamentis Exp $
+/* $Id: mod_guessbin.c,v 1.6 2007-02-27 09:28:53 tamentis Exp $
  *
  * Copyright (c) 2007 Bertrand Janin <tamentis@neopulsar.org>
  * All rights reserved.
@@ -110,8 +110,8 @@ void
 guessbin_score_history()
 {
 	char sr[50];
-	int i;
-	unsigned tm = tbc.height / 2 - (NUMOFQUEST + 7) / 2;
+	int i, color;
+	unsigned int tm = tbc.height / 2 - (NUMOFQUEST + 7) / 2;
 
 	/* result table header */
 	wbkgdset(tbc.screen, COLOR_PAIR(TEXT_DEFAULT));
@@ -121,12 +121,12 @@ guessbin_score_history()
 
 	/* all answers */
 	for (i = 0; i < NUMOFQUEST; i++) {
-		int color = TEXT_GREEN;
+		color = TEXT_GREEN;
 
 		if (history[i].error)
 			color = TEXT_RED;
 
-		snprintf(sr, 50, "% -2d. %02d:%02d:%02d  vs  %02d:%02d:%02d", 
+		snprintf(sr, 50, "% 2d. %02d:%02d:%02d  vs  %02d:%02d:%02d", 
 				i + 1, 
 				history[i].gh, history[i].gm, history[i].gs,
 				history[i].uh, history[i].um, history[i].us);
@@ -210,18 +210,18 @@ guessbin_score()
 	for (;;) {
 		c = getch();
 
-		if (c == KB_R)
+		if (c == KB_R) {
+			tbc_clear();
 			mode = mode == 0 ? 1 : 0;
-		else if (c != -1)
+		} else if (c != -1)
 			break;
 
-		tbc_clear_innerzone();
 		if (mode == 1)
 			guessbin_score_history();
 		else 
 			guessbin_score_table();
 
-		tbc_refresh();
+		refresh();
 		usleep(TICK);
 	}
 
@@ -296,9 +296,9 @@ guessbin_shuffle()
 {
 	srand(time(NULL));
 
-	g->h = rand()%23;
-	g->m = rand()%59;
-	g->s = rand()%59;
+	g->h = rand() % 23;
+	g->m = rand() % 59;
+	g->s = rand() % 59;
 
 	tbc_draw_time(3, g->h, g->m, g->s, 0);
 }
@@ -368,19 +368,23 @@ guessbin_init()
 	mvwprintw(tbc.screen, hh + 6, hw - 25, INTRO_HELP4);
 	mvwprintw(tbc.screen, hh + 7, hw - 25, INTRO_HELP5);
 	guessbin_menu_diff(g->diff);
+
 	for (;;) {
 		c = getch();
 
-		if (c == 0x44)
+		switch (c) {
+		case KB_LEFT:
 			guessbin_menu_diff(g->diff > 1 ? --(g->diff) : g->diff);
-		else if (c == 0x43)
+			break;
+		case KB_RIGHT:
 			guessbin_menu_diff(g->diff < 3 ? ++(g->diff) : g->diff);
-		else if (c == 0x0A) {
-			tbc_clear_innerzone();
+			break;
+		case KB_ENTER:
+			tbc_clear();
 			break;
 		}
 
-		tbc_refresh();
+		refresh();
 
 		usleep(TICK);
 	}
@@ -388,22 +392,27 @@ guessbin_init()
 	g->t_start = time(NULL);
 	g->t_used = 0;
 	g->t_elapsed = 0;
-	if (g->diff == 3) {
+
+	switch (g->diff) {
+	case 3:
 		g->t_allowed = TIME_HARD;
 		g->t_end = g->t_start + TIME_HARD;
-	} else if (g->diff == 2) {
+		break;
+	case 2:
 		g->t_allowed = TIME_NORMAL;
 		g->t_end = g->t_start + TIME_NORMAL;
-	} else {
+		break;
+	default:
 		g->t_allowed = TIME_EASY;
 		g->t_end = g->t_start + TIME_EASY;
+		break;
 	}
 
 	return (g);
 }
 
 
-/* guessbin_time - this displays the two progressbar! */
+/* guessbin_time - this displays the two progressbars! */
 void
 guessbin_timeline(unsigned long current, unsigned long total)
 {
@@ -489,7 +498,7 @@ guessbin_clearprompt(int *size)
 }
 
 
-/* game_guessbin - main part, setup and loop */
+/* game_guessbin - setup and loop */
 void
 mod_guessbin()
 {
@@ -498,16 +507,20 @@ mod_guessbin()
 	unsigned char status[32];
 	int size = 0;
 
+	tbc.res_x = 6;
+
         if (tbc.opt_vertical)
-		tbc_configure(4, 6, -1, 53, 17, 0, 0);
+		tbc.res_y = 5;
 	else
-		tbc_configure(3, 6, -1, 53, 18, 0, 0);
+		tbc.res_y = 4;
+
+	tbc_configure();
 
 	g = guessbin_init();
 
 	tbc.opt_helper = 0;
 
-	/* Game loop */
+	/* main loop */
 	mvwprintw(tbc.screen, tbc.height - 3, QUESTION_LEFT, PROMPT_TEXT);
 	guessbin_shuffle();
 	for (;;) {
@@ -530,7 +543,7 @@ mod_guessbin()
 		if (g->q_cur >= g->q_tot)
 			break;
 
-		if (c == KB_RETURN) { /* Enter, matches ? */
+		if (c == KB_RETURN) {
 			if (guessbin_matches(is, size)) {
 				guessbin_correct();
 			} else {
@@ -539,7 +552,7 @@ mod_guessbin()
 
 			guessbin_clearprompt(&size);
 
-		} else if (c == KB_BACKSPACE) { /* Backspace */
+		} else if (c == KB_BACKSPACE) {
 			if (size < 1)
 				continue;
 			is[size-1] = 0;
@@ -553,7 +566,7 @@ mod_guessbin()
 		} else if (c == KB_CLEAR) { /* ^U */
 			guessbin_clearprompt(&size);
 	
-		} else if (c > 47 && c < 59 && size < 8) { /* Number or ':' */
+		} else if (c > 47 && c < 59 && size < 8) { /* number or ':' */
 			is[size] = c;
 			is[size+1] = 0;
 			size++;
@@ -564,13 +577,13 @@ mod_guessbin()
 					(char*)is);
 		}
 
-		tbc_refresh();
+		refresh();
 
 		usleep(TICK);
 	}
 
-	/* Show score */
-	tbc_clear_innerzone();
+	/* show score */
+	tbc_clear();
 	guessbin_score();
 
 }

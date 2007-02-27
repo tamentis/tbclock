@@ -1,3 +1,5 @@
+tbclock-1.10
+ - fixed signedness in mod_clock for linux/ppc
 tbclock-1.9
  - players/users can now display a decimal help in different form using
    'h' key in 'clock' and 'chrono' or with -H on command line. 
