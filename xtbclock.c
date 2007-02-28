@@ -1,4 +1,4 @@
-/* $Id: mod_clock.c,v 1.7 2007-02-28 12:47:35 tamentis Exp $
+/* $Id: xtbclock.c,v 1.1 2007-02-28 12:47:35 tamentis Exp $
  *
  * Copyright (c) 2007 Bertrand Janin <tamentis@neopulsar.org>
  * All rights reserved.
@@ -23,63 +23,53 @@
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
- *
  */
 
-#include <unistd.h>
-#include <curses.h>
-#include <time.h>
+/* THIS FILE IS WORK IN PROGRESS... */
 
-#include "tbclock.h"
+#include <X11/Xlib.h>
 
-extern struct tbclock_data tbc;
+#include <err.h>
 
-/* mod_clock */
-void
-mod_clock()
+//#include "tbclock.h"
+
+
+int
+main(int ac, char **av)
 {
-	time_t now;
-	struct tm *tm;
-	signed char c;
+	Display *dpy;
+	Window root_win;
+	GC gc;
 
-	/* base configuration */
-	tbc.format.res_x = 6;
-	if (tbc.options.vertical)
-		tbc.format.res_y = 4;
-	else
-		tbc.format.res_y = 3;
-	tbc_configure();
-
-	for (;;) {
-		if ((c = getch()) > 0) {
-			switch (c) {
-				case KB_H:
-					tbc_next_help_value();
-					tbc_configure();
-					break;
-				case KB_A:
-					if (tbc.options.vertical) {
-						tbc.options.vertical = 0;
-						tbc.format.res_y = 3;
-					} else {
-						tbc.options.vertical = 1;
-						tbc.format.res_y = 4;
-					}
-					tbc_configure();
-					break;
-				default:
-					return;
-			}
-		}
-
-
-		now = time(NULL);
-		tm = localtime(&now);
-
-		tbc_draw_time(3, tm->tm_hour, tm->tm_min, tm->tm_sec, 0);
-
-		refresh();
-		usleep(10000);
+	dpy = XOpenDisplay(":0");
+	if (dpy == NULL) {
+		errx(-1, "Unable to connect to X server.");
 	}
+	
+	root_win = DefaultRootWindow(dpy);
+
+	GC green_gc;
+	XColor green_col;
+	Colormap colormap;
+	char green[] = "#00FF00";
+
+	colormap = DefaultColormap(dpy, 0);
+	green_gc = XCreateGC(dpy, root_win, 0, 0);
+
+	XParseColor(dpy, colormap, green, &green_col);
+	XAllocColor(dpy, colormap, &green_col);
+	XSetForeground(dpy, green_gc, green_col.pixel);
+
+	XDrawRectangle(dpy, root_win, green_gc, 1, 1, 497, 497);
+	XDrawRectangle(dpy, root_win, green_gc, 50, 50, 398, 398);
+	XFillRectangle(dpy, root_win, green_gc, 60, 150, 50, 60);
+
+	XFlush(dpy);
+
+	sleep(5);
+	
+	XCloseDisplay(dpy);
+
+	return (0);
 }
 

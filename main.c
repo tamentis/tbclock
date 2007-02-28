@@ -1,4 +1,4 @@
-/* $Id: main.c,v 1.8 2007-02-27 10:58:41 tamentis Exp $
+/* $Id: main.c,v 1.9 2007-02-28 12:47:35 tamentis Exp $
  *
  * Copyright (c) 2007 Bertrand Janin <tamentis@neopulsar.org>
  * All rights reserved.
@@ -45,13 +45,13 @@ tbc_next_help_value()
 {
 	unsigned int tm, lm;
 
-	tm = tbc.top_margin + tbc.dot_h / 2;
-	lm = tbc.width - tbc.left_margin + tbc.left_margin / 2 - 1;
+	tm = tbc.format.top_margin + tbc.format.dot_h / 2;
+	lm = tbc.format.width - tbc.format.left_margin / 2 - 1;
 
-	if (tbc.opt_helper > 2)
-		tbc.opt_helper = 0;
+	if (tbc.options.helper > 2)
+		tbc.options.helper = 0;
 	else    
-		tbc.opt_helper++;
+		tbc.options.helper++;
 
 }
 
@@ -62,19 +62,20 @@ tbc_set_default()
 {
 	tbc.bigbang = time(NULL);
 
-	tbc.width = 80;
-	tbc.height = 24;
+	tbc.format.width = 80;
+	tbc.format.height = 24;
 
-	tbc.opt_frame = tbc.org_frame = 1;
-	tbc.opt_border = tbc.org_border = 1;
-	tbc.opt_dots = 1;
-	tbc.opt_vertical = 0;
-	tbc.opt_helper = 0;
+	tbc.options.frame = tbc.options.frame_default = 1;
+	tbc.options.border = tbc.options.border_default = 1;
+	tbc.options.dots = 1;
+	tbc.options.vertical = 0;
+	tbc.options.helper = 0;
+	tbc.options.ampm = 0;
 
-	tbc.col_h = COLOR_BLUE;
-	tbc.col_m = COLOR_RED;
-	tbc.col_s = COLOR_YELLOW;
-	tbc.col_t = COLOR_GREEN;
+	tbc.colors.hour = COLOR_BLUE;
+	tbc.colors.minute = COLOR_RED;
+	tbc.colors.second = COLOR_YELLOW;
+	tbc.colors.tenth = COLOR_GREEN;
 }
 
 
@@ -88,53 +89,61 @@ tbc_configure()
 {
 
 	/* terminal is too small, removing frame & border */
-	if (tbc.height < 10 || tbc.width < 19)
-		tbc.opt_frame = tbc.opt_border = 0;
+	if (tbc.format.height < 10 || tbc.format.width < 19)
+		tbc.options.frame = tbc.options.border = 0;
 	else {
-		tbc.opt_frame = tbc.org_frame;
-		tbc.opt_border = tbc.org_border;
+		tbc.options.frame = tbc.options.frame_default;
+		tbc.options.border = tbc.options.border_default;
 	}
 
 	/* term not wide enough for horizontal helper */
-	if (!tbc.opt_vertical && tbc.width < 8 && tbc.opt_helper & 1)
-		tbc.opt_helper --;
+	if (!tbc.options.vertical && tbc.format.width < 8 
+			&& tbc.options.helper & 1)
+		tbc.options.helper --;
 
 	/* term is not tall enough for bottom help in vertical mode */
-	if (tbc.opt_vertical && tbc.height < 5 && tbc.opt_helper > 0)
-		tbc.opt_helper = 0;
+	if (tbc.options.vertical && tbc.format.height < 5 
+			&& tbc.options.helper > 0)
+		tbc.options.helper = 0;
 
 	/* term is not tall enough for bottom help */
-	if (tbc.height < 4 && tbc.opt_helper > 1)
-		tbc.opt_helper -= 2;
+	if (tbc.format.height < 4 && tbc.options.helper > 1)
+		tbc.options.helper -= 2;
 
 	/* height of a dot (term height - frame - spaces - helper) */
-	tbc.dot_h = (tbc.height
-			- tbc.opt_frame * 2
-			- (tbc.res_y - 1) * tbc.opt_border
-			- (!tbc.opt_vertical && tbc.opt_helper > 1 ? 1 : 0)
-			- (tbc.opt_vertical && tbc.opt_helper ? 1 : 0)
-		    ) / tbc.res_y;
+	tbc.format.dot_h = 
+	    ( tbc.format.height
+		- tbc.options.frame * 2
+		- (tbc.format.res_y - 1) * tbc.options.border
+		- (!tbc.options.vertical && tbc.options.helper > 1 ? 1 : 0)
+		- (tbc.options.vertical && tbc.options.helper ? 1 : 0)
+	    ) / tbc.format.res_y;
 
 	/* width of a dot */
-	tbc.dot_w = (tbc.width
-			- tbc.opt_frame * 2
-			- (tbc.res_x - 1) * tbc.opt_border
-			- (!tbc.opt_vertical && tbc.opt_helper & 1 ? 2 : 0)
-		    ) / tbc.res_x;
+	tbc.format.dot_w = 
+	    ( tbc.format.width
+		- tbc.options.frame * 2
+		- (tbc.format.res_x - 1) * tbc.options.border
+		- (!tbc.options.vertical && tbc.options.helper & 1 ? 2 : 0)
+	    ) / tbc.format.res_x;
 
 	/* top margin */
-	tbc.top_margin = tbc.opt_frame +
-		(tbc.height - tbc.opt_frame * 2 - tbc.res_y * tbc.dot_h
-		 - (tbc.res_y - 1) * tbc.opt_border
-		 - (!tbc.opt_vertical && tbc.opt_helper & 1 ? 2 : 0)
-		) / 2;
+	tbc.format.top_margin = tbc.options.frame +
+	    ( tbc.format.height
+		- tbc.options.frame * 2 
+		- tbc.format.res_y * tbc.format.dot_h
+		- (tbc.format.res_y - 1) * tbc.options.border
+		- (!tbc.options.vertical && tbc.options.helper & 1 ? 2 : 0)
+	    ) / 2;
 
 	/* left margin */
-	tbc.left_margin = tbc.opt_frame + 
-		(tbc.width - tbc.opt_frame * 2 - tbc.res_x * tbc.dot_w
-		 - (tbc.res_x - 1) * tbc.opt_border
-		 - (!tbc.opt_vertical && tbc.opt_helper & 1 ? 2 : 0)
-		) / 2;
+	tbc.format.left_margin = tbc.options.frame + 
+	    ( tbc.format.width
+		- tbc.options.frame * 2
+		- tbc.format.res_x * tbc.format.dot_w
+		- (tbc.format.res_x - 1) * tbc.options.border
+		- (!tbc.options.vertical && tbc.options.helper & 1 ? 2 : 0)
+	    ) / 2;
 
 	tbc_clear();
 
@@ -151,39 +160,42 @@ main(int ac, char **av)
 
 	tbc_set_default();
 
-	while ((ch = getopt(ac, av, "abdefg:hvm:H:M:S:T:")) != -1) {
+	while ((ch = getopt(ac, av, "abdefg:hvm:pH:M:S:T:")) != -1) {
 		switch (ch) {
 		case 'a':
-			tbc.opt_vertical = 1;
+			tbc.options.vertical = 1;
 			break;
 		case 'b':
-			tbc.opt_border = tbc.org_frame = 0;
+			tbc.options.border = tbc.options.border_default = 0;
 			break;
 		case 'd':
-			tbc.opt_dots = 0;
+			tbc.options.dots = 0;
 			break;
 		case 'e':
-			tbc.opt_helper++;
+			tbc.options.helper++;
 			break;
 		case 'f':
-			tbc.opt_frame = tbc.org_frame = 0;
+			tbc.options.frame = tbc.options.frame_default = 0;
 			break;
 		case 'g':
 		case 'm':
 			strncpy(modulename, optarg, 9);
 			modulename[8] = 0;
 			break;
+		case 'p':
+			tbc.options.ampm = 1;
+			break;
 		case 'H':
-			SET_COLOR(tbc.col_h);
+			SET_COLOR(tbc.colors.hour);
 			break;
 		case 'M':
-			SET_COLOR(tbc.col_m);
+			SET_COLOR(tbc.colors.minute);
 			break;
 		case 'S':
-			SET_COLOR(tbc.col_s);
+			SET_COLOR(tbc.colors.second);
 			break;
 		case 'T':
-			SET_COLOR(tbc.col_t);
+			SET_COLOR(tbc.colors.tenth);
 			break;
 		case 'v':
 			printf(TBCCOPY);
@@ -201,8 +213,8 @@ main(int ac, char **av)
 
 	/* module selection */
 	if (strncmp(modulename, "guessbin", 9) == 0) {
-		tbc.opt_frame = 1;
-		tbc.opt_border = 1;
+		tbc.options.frame = 1;
+		tbc.options.border = 1;
 		mod_guessbin();
 	} else if (strncmp(modulename, "chrono", 7) == 0) {
 		mod_chrono();

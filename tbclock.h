@@ -1,4 +1,4 @@
-/* $Id: tbclock.h,v 1.5 2007-02-27 09:53:35 tamentis Exp $
+/* $Id: tbclock.h,v 1.6 2007-02-28 12:47:35 tamentis Exp $
  *
  * Copyright (c) 2007 Bertrand Janin <tamentis@neopulsar.org>
  * All rights reserved.
@@ -63,9 +63,7 @@
 #define KB_H		0x68
 #define KB_R		0x72
 
-/* main and only data type */
-struct tbclock_data {
-	WINDOW *screen;
+struct tbclock_format {
 	int top_margin;
 	int left_margin;
 	int dot_w;
@@ -74,18 +72,33 @@ struct tbclock_data {
 	int res_y;
 	int height;
 	int width;
+};
+
+struct tbclock_options {
+	int frame_default;
+	int border_default;
+	int frame;
+	int border;
+	int dots;
+	int vertical;
+	int helper;
+	int ampm;
+};
+
+struct tbclock_colors {
+	int hour;
+	int minute;
+	int second;
+	int tenth;
+};
+
+/* main and only data type */
+struct tbclock_data {
+	WINDOW *screen;
 	time_t bigbang;
-	int org_frame;
-	int opt_frame;
-	int org_border;
-	int opt_border;
-	int opt_dots;
-	int opt_vertical;
-	int opt_helper;
-	int col_h;
-	int col_m;
-	int col_s;
-	int col_t;
+	struct tbclock_format format;
+	struct tbclock_options options;
+	struct tbclock_colors colors;
 };
 
 /* prototypes for main.c */

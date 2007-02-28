@@ -1,4 +1,4 @@
-.\" $Id: tbclock.1,v 1.6 2007-02-27 09:28:53 tamentis Exp $
+.\" $Id: tbclock.1,v 1.7 2007-02-28 12:47:35 tamentis Exp $
 .\" 
 .\" Copyright (c) 2007 Bertrand Janin <tamentis@neopulsar.org>
 .\" All rights reserved.
@@ -31,7 +31,7 @@ tbclock \- binary clock with some fun features
 
 .SH SYNOPSIS
 .B tbclock
-[-abdefvh] [-HMST color] [-m module]
+[-abdefpvh] [-HMST color] [-m module]
 
 .SH DESCRIPTION
 .B tbclock
@@ -88,7 +88,11 @@ meaning :
      1: Red           5: Magenta
      2: Green         6: Cyan
      3: Yellow        7: White
-
+.TP
+.B -p
+Force
+.B tbclock
+to use 12 hours display instead of 24, am/pm will not be shown.
 
 .SH MODULES
 .TP

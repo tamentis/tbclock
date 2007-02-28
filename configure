@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# $Id: configure,v 1.1 2007-02-27 10:58:41 tamentis Exp $
+# $Id: configure,v 1.2 2007-02-28 12:47:35 tamentis Exp $
 #
 # Copyright (c) 2007 Bertrand Janin <tamentis@neopulsar.org>
 # All rights reserved.
@@ -51,6 +51,9 @@ all: \$(BEAST)
 tbclock: \$(OBJ)
 	\$(CC) \$(CFLAGS) \$(LIBFLAGS) \$(OBJ) -o \$(BEAST)
 
+#xtbclock: xtbclock.c
+#	\$(CC) \$(CFLAGS) -I/usr/X11R6/include -lX11 -L/usr/X11R6/lib xtbclock.c -o xtbclock
+
 .c.o: tbclock.h
 	\$(CC) -c \$(CFLAGS) $<
 
@@ -64,5 +67,8 @@ deinstall:
 
 clean:
 	rm -f \$(BEAST) \$(OBJ)
+
+distclean: clean
+	rm -f Makefile
 
 EOF

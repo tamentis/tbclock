@@ -11,10 +11,9 @@ with -a, see man file.
 
 Installation
 -----------------------------------------------------------------------
+./configure
 make
 make install
-
-(Use gmake if you are using a non-gnu operating system)
 
 
 Notes
@@ -26,5 +25,5 @@ tamentis at neopulsar dot org ... thanks!
 
 
 -----------------------------------------------------------------------
-$Id: README,v 1.7 2007-02-27 09:53:35 tamentis Exp $
+$Id: README,v 1.8 2007-02-28 12:47:35 tamentis Exp $
 -----------------------------------------------------------------------

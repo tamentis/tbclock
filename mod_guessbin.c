@@ -1,4 +1,4 @@
-/* $Id: mod_guessbin.c,v 1.8 2007-02-27 10:36:23 tamentis Exp $
+/* $Id: mod_guessbin.c,v 1.9 2007-02-28 12:47:35 tamentis Exp $
  *
  * Copyright (c) 2007 Bertrand Janin <tamentis@neopulsar.org>
  * All rights reserved.
@@ -111,13 +111,13 @@ guessbin_score_history()
 {
 	char sr[50];
 	int i, color;
-	unsigned int tm = tbc.height / 2 - (NUMOFQUEST + 7) / 2;
+	unsigned int tm = tbc.format.height / 2 - (NUMOFQUEST + 7) / 2;
 
 	/* result table header */
 	wbkgdset(tbc.screen, COLOR_PAIR(TEXT_DEFAULT));
-	mvwprintw(tbc.screen, tm, tbc.width / 2 - H_OFFSET, H_HEAD1);
-	mvwprintw(tbc.screen, tm + 2, tbc.width / 2 - H_OFFSET, H_HEAD2);
-	mvwprintw(tbc.screen, tm + 3, tbc.width / 2 - H_OFFSET, H_LINE);
+	mvwprintw(tbc.screen, tm, tbc.format.width / 2 - H_OFFSET, H_HEAD1);
+	mvwprintw(tbc.screen, tm + 2, tbc.format.width / 2 - H_OFFSET, H_HEAD2);
+	mvwprintw(tbc.screen, tm + 3, tbc.format.width / 2 - H_OFFSET, H_LINE);
 
 	/* all answers */
 	for (i = 0; i < NUMOFQUEST; i++) {
@@ -131,13 +131,13 @@ guessbin_score_history()
 				history[i].gh, history[i].gm, history[i].gs,
 				history[i].uh, history[i].um, history[i].us);
 		wbkgdset(tbc.screen, COLOR_PAIR(color));
-		mvwprintw(tbc.screen, tm + 4 + i, tbc.width / 2 - 14, sr);
+		mvwprintw(tbc.screen, tm + 4 + i, tbc.format.width / 2 - 14, sr);
 	}
 
 	/* footer */
 	wbkgdset(tbc.screen, COLOR_PAIR(TEXT_DEFAULT));
-	mvwprintw(tbc.screen, tm + 4 + i, tbc.width / 2 - H_OFFSET, H_LINE);
-	mvwprintw(tbc.screen, tm + 6 + i, tbc.width / 2 - H_OFFSET - 4, H_FOOT);
+	mvwprintw(tbc.screen, tm + 4 + i, tbc.format.width / 2 - H_OFFSET, H_LINE);
+	mvwprintw(tbc.screen, tm + 6 + i, tbc.format.width / 2 - H_OFFSET - 4, H_FOOT);
 }
 
 
@@ -153,8 +153,8 @@ guessbin_score_table()
 	/* time bonus */
 	if ((g->t_used / g->q_tot) <= (g->t_allowed / 2)) {
 		points += 1000;
-		mvwprintw(tbc.screen, tbc.height / 2 - SCORE_TOP + line,
-				tbc.width / 2 - 15, SCORE_TIME);
+		mvwprintw(tbc.screen, tbc.format.height / 2 - SCORE_TOP + line,
+				tbc.format.width / 2 - 15, SCORE_TIME);
 		line++;
 	}
 
@@ -162,8 +162,8 @@ guessbin_score_table()
 	if (g->diff > 1 && g->q_ok > 0) {
 		points += 1000 * g->diff * (g->q_tot/g->q_ok);
 		snprintf(s_bonus, 32, SCORE_DIFF, 1000 * g->diff);
-		mvwprintw(tbc.screen, tbc.height / 2 - SCORE_TOP + line,
-				tbc.width / 2 - 15, s_bonus);
+		mvwprintw(tbc.screen, tbc.format.height / 2 - SCORE_TOP + line,
+				tbc.format.width / 2 - 15, s_bonus);
 		line++;
 	}
 
@@ -171,8 +171,8 @@ guessbin_score_table()
 	if (g->q_ok > 0) {
 		points += 200 * g->q_ok;
 		snprintf(s_bonus, 32, SCORE_GOOD, 200 * g->q_ok);
-		mvwprintw(tbc.screen, tbc.height / 2 - SCORE_TOP + line,
-				tbc.width / 2 - 15, s_bonus);
+		mvwprintw(tbc.screen, tbc.format.height / 2 - SCORE_TOP + line,
+				tbc.format.width / 2 - 15, s_bonus);
 		line++;
 	}
 
@@ -181,22 +181,22 @@ guessbin_score_table()
 		points -= 100 * g->q_err;
 		if (points < 0) points = 0;
 		snprintf(s_bonus, 32, SCORE_OOPS, 100 * g->q_err);
-		mvwprintw(tbc.screen, tbc.height / 2 - SCORE_TOP + line,
-				tbc.width / 2 - 15, s_bonus);
+		mvwprintw(tbc.screen, tbc.format.height / 2 - SCORE_TOP + line,
+				tbc.format.width / 2 - 15, s_bonus);
 		line++;
 	}
 
 	/* footer */
-	mvwprintw(tbc.screen, tbc.height / 2 - SCORE_TOP + line, 
-			tbc.width / 2 - 16, SCORE_LINE);
+	mvwprintw(tbc.screen, tbc.format.height / 2 - SCORE_TOP + line, 
+			tbc.format.width / 2 - 16, SCORE_LINE);
 	l = snprintf(s_score, 32, SCORE_TITLE, points);
 	wbkgdset(tbc.screen, COLOR_PAIR(TEXT_GREEN));
-	mvwprintw(tbc.screen, tbc.height / 2 - SCORE_TOP + line + 1,
-			tbc.width / 2 - l / 2, s_score);
+	mvwprintw(tbc.screen, tbc.format.height / 2 - SCORE_TOP + line + 1,
+			tbc.format.width / 2 - l / 2, s_score);
 
 	wbkgdset(tbc.screen, COLOR_PAIR(TEXT_DEFAULT));
-	mvwprintw(tbc.screen, tbc.height / 2 - SCORE_TOP + line + 4,
-			tbc.width / 2 - 16, SCORE_FOOT);
+	mvwprintw(tbc.screen, tbc.format.height / 2 - SCORE_TOP + line + 4,
+			tbc.format.width / 2 - 16, SCORE_FOOT);
 }
 
 
@@ -314,25 +314,25 @@ guessbin_menu_diff(int highlight)
 		wbkgdset(tbc.screen, COLOR_PAIR(BACK_YELLOW));
 	else
 		wbkgdset(tbc.screen, COLOR_PAIR(BACK_DEFAULT));
-	mvwprintw(tbc.screen, tbc.height/2+1, tbc.width/2-14, "[ Easy ]");
+	mvwprintw(tbc.screen, tbc.format.height/2+1, tbc.format.width/2-14, "[ Easy ]");
 
 	wbkgdset(tbc.screen, COLOR_PAIR(0));
-	mvwprintw(tbc.screen, tbc.height/2+1, tbc.width/2-6, " ");
+	mvwprintw(tbc.screen, tbc.format.height/2+1, tbc.format.width/2-6, " ");
 
 	if (highlight == 2)
 		wbkgdset(tbc.screen, COLOR_PAIR(BACK_YELLOW));
 	else
 		wbkgdset(tbc.screen, COLOR_PAIR(BACK_DEFAULT));
-	mvwprintw(tbc.screen, tbc.height/2+1, tbc.width/2-5, "[ Normal ]");
+	mvwprintw(tbc.screen, tbc.format.height/2+1, tbc.format.width/2-5, "[ Normal ]");
 
 	wbkgdset(tbc.screen, COLOR_PAIR(0));
-	mvwprintw(tbc.screen, tbc.height/2+1, tbc.width/2+5, " ");
+	mvwprintw(tbc.screen, tbc.format.height/2+1, tbc.format.width/2+5, " ");
 
 	if (highlight == 3)
 		wbkgdset(tbc.screen, COLOR_PAIR(BACK_YELLOW));
 	else
 		wbkgdset(tbc.screen, COLOR_PAIR(BACK_DEFAULT));
-	mvwprintw(tbc.screen, tbc.height/2+1, tbc.width/2+6, "[ Hard ]");
+	mvwprintw(tbc.screen, tbc.format.height/2+1, tbc.format.width/2+6, "[ Hard ]");
 
 	wbkgdset(tbc.screen, COLOR_PAIR(BACK_DEFAULT));
 
@@ -349,7 +349,7 @@ guessbin_init()
 
 	/* Set up what never moves... */
 	wbkgdset(tbc.screen, COLOR_PAIR(TEXT_DEFAULT));
-	mvwprintw(tbc.screen, tbc.height-1, tbc.width-18, "Ctrl-C to Quit");
+	mvwprintw(tbc.screen, tbc.format.height-1, tbc.format.width-18, "Ctrl-C to Quit");
 
 	g = malloc(sizeof(struct guessbin));
 	g->q_tot = NUMOFQUEST;
@@ -359,8 +359,8 @@ guessbin_init()
 	g->diff  = 1;
 
 	/* Ask for difficulty */
-	hh = tbc.height / 2;
-	hw = tbc.width / 2;
+	hh = tbc.format.height / 2;
+	hw = tbc.format.width / 2;
 	mvwprintw(tbc.screen, hh - 1, hw - 20, INTRO_TITLE);
 	mvwprintw(tbc.screen, hh + 3, hw - 25, INTRO_HELP1);
 	mvwprintw(tbc.screen, hh + 4, hw - 25, INTRO_HELP2);
@@ -417,14 +417,14 @@ guessbin_timeline(unsigned long current, unsigned long total)
 	float ratio;
 
 	ratio = (float) current / (float)total;
-	sh = (tbc.height - 2) * (1 - ratio);
+	sh = (tbc.format.height - 2) * (1 - ratio);
 
-	for (i = 1; i < tbc.height - 1; i++) {
+	for (i = 1; i < tbc.format.height - 1; i++) {
 		if (i < sh + 1)
 			wbkgdset(tbc.screen, COLOR_PAIR(BLOCK_DEFAULT));
 		else
 			wbkgdset(tbc.screen, COLOR_PAIR(BLOCK_GREEN));
-		mvwprintw(tbc.screen, i, tbc.width - 3, "  ");
+		mvwprintw(tbc.screen, i, tbc.format.width - 3, "  ");
 		mvwprintw(tbc.screen, i, 1, "  ");
 	}
 
@@ -437,7 +437,7 @@ void
 guessbin_incorrect()
 {
 	wbkgdset(tbc.screen, COLOR_PAIR(TEXT_RED));
-	mvwprintw(tbc.screen, tbc.height - 4, QUESTION_LEFT, COMMENT_BAD);
+	mvwprintw(tbc.screen, tbc.format.height - 4, QUESTION_LEFT, COMMENT_BAD);
 	g->q_err++;
 }
 
@@ -451,7 +451,7 @@ guessbin_correct()
 	now = time(NULL);
 
 	wbkgdset(tbc.screen, COLOR_PAIR(TEXT_GREEN));
-	mvwprintw(tbc.screen, tbc.height - 4, QUESTION_LEFT, COMMENT_GOOD);
+	mvwprintw(tbc.screen, tbc.format.height - 4, QUESTION_LEFT, COMMENT_GOOD);
 	guessbin_shuffle();
 
 	g->t_used += now - g->t_start;
@@ -468,7 +468,7 @@ void
 guessbin_timeout(unsigned char *is, int size)
 {
 	wbkgdset(tbc.screen, COLOR_PAIR(TEXT_RED));
-	mvwprintw(tbc.screen, tbc.height - 4, QUESTION_LEFT, COMMENT_TIMEOUT);
+	mvwprintw(tbc.screen, tbc.format.height - 4, QUESTION_LEFT, COMMENT_TIMEOUT);
 	guessbin_shuffle();
 
 	history[g->q_cur].gh = g->h;
@@ -489,8 +489,8 @@ void
 guessbin_clearprompt(int *size)
 {
 	wbkgdset(tbc.screen, COLOR_PAIR(TEXT_DEFAULT));
-	mvwprintw(tbc.screen, tbc.height-3, PROMPT_LEFT, PROMPT_BLANK);
-	move(tbc.height-3, 19);
+	mvwprintw(tbc.screen, tbc.format.height-3, PROMPT_LEFT, PROMPT_BLANK);
+	move(tbc.format.height-3, 19);
 	*size = 0;
 }
 
@@ -505,21 +505,22 @@ mod_guessbin()
 	int size = 0;
 	time_t now;
 
-	tbc.res_x = 6;
+	tbc.format.res_x = 6;
 
-        if (tbc.opt_vertical)
-		tbc.res_y = 5;
+        if (tbc.options.vertical)
+		tbc.format.res_y = 5;
 	else
-		tbc.res_y = 4;
+		tbc.format.res_y = 4;
 
 	tbc_configure();
 
 	g = guessbin_init();
 
-	tbc.opt_helper = 0;
+	tbc.options.helper = 0;
+	tbc.options.ampm = 0;
 
 	/* main loop */
-	mvwprintw(tbc.screen, tbc.height - 3, QUESTION_LEFT, PROMPT_TEXT);
+	mvwprintw(tbc.screen, tbc.format.height - 3, QUESTION_LEFT, PROMPT_TEXT);
 	guessbin_shuffle();
 	for (;;) {
 		c = getch();
@@ -527,7 +528,7 @@ mod_guessbin()
 
 		snprintf((char*)status, 32, "%s [%u/%u]", s_diff[g->diff], 
 				g->q_cur, g->q_tot);
-		mvwprintw(tbc.screen, tbc.height-1, 4, (char*)status);
+		mvwprintw(tbc.screen, tbc.format.height-1, 4, (char*)status);
 
 		guessbin_timeline(g->t_end - now, g->t_end - g->t_start);
 
@@ -554,9 +555,9 @@ mod_guessbin()
 			is[size-1] = 0;
 			size--;
 			wbkgdset(tbc.screen, COLOR_PAIR(TEXT_DEFAULT));
-			mvwprintw(tbc.screen, tbc.height - 3, PROMPT_LEFT, 
+			mvwprintw(tbc.screen, tbc.format.height - 3, PROMPT_LEFT, 
 					"        ");
-			mvwprintw(tbc.screen, tbc.height - 3, PROMPT_LEFT, 
+			mvwprintw(tbc.screen, tbc.format.height - 3, PROMPT_LEFT, 
 					(char*)is);
 
 		} else if (c == KB_CLEAR) { /* ^U */
@@ -567,9 +568,9 @@ mod_guessbin()
 			is[size+1] = 0;
 			size++;
 			wbkgdset(tbc.screen, COLOR_PAIR(TEXT_DEFAULT));
-			mvwprintw(tbc.screen, tbc.height - 4, QUESTION_LEFT, 
+			mvwprintw(tbc.screen, tbc.format.height - 4, QUESTION_LEFT, 
 					COMMENT_BLANK);
-			mvwprintw(tbc.screen, tbc.height - 3, PROMPT_LEFT, 
+			mvwprintw(tbc.screen, tbc.format.height - 3, PROMPT_LEFT, 
 					(char*)is);
 		}
 

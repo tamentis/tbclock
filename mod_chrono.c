@@ -1,4 +1,4 @@
-/* $Id: mod_chrono.c,v 1.7 2007-02-27 10:36:23 tamentis Exp $
+/* $Id: mod_chrono.c,v 1.8 2007-02-28 12:47:35 tamentis Exp $
  *
  * Copyright (c) 2007 Bertrand Janin <tamentis@neopulsar.org>
  * All rights reserved.
@@ -65,12 +65,12 @@ mod_chrono()
 	int pause = 0;
 	signed char c;
 
-	tbc.res_y = 4;
+	tbc.format.res_y = 4;
 
-	if (tbc.opt_vertical)
-		tbc.res_x = 7;
+	if (tbc.options.vertical)
+		tbc.format.res_x = 7;
 	else
-		tbc.res_x = 6;
+		tbc.format.res_x = 6;
 
 	tbc_configure();
 
@@ -86,7 +86,7 @@ mod_chrono()
 			} else {
 				pause = 0;
 				wbkgdset(tbc.screen, COLOR_PAIR(TEXT_DEFAULT));
-				mvwprintw(tbc.screen, 2, tbc.width / 2 - 6, 
+				mvwprintw(tbc.screen, 2, tbc.format.width / 2 - 6, 
 						"             ");
 				start = start + chrono_nds() - paused;
 			}
@@ -102,12 +102,12 @@ mod_chrono()
 			tbc_next_help_value();
 			tbc_configure();
 		} else if (c == KB_A) {
-			if (tbc.opt_vertical) {
-				tbc.opt_vertical = 0;
-				tbc.res_x = 6;
+			if (tbc.options.vertical) {
+				tbc.options.vertical = 0;
+				tbc.format.res_x = 6;
 			} else {
-				tbc.opt_vertical = 1;
-				tbc.res_x = 7;
+				tbc.options.vertical = 1;
+				tbc.format.res_x = 7;
 			}
 			tbc_configure();
 		} else if (c > 0)
@@ -124,7 +124,7 @@ mod_chrono()
 			tbc_draw_time(4, hour, min, sec, dsec);
 		} else {
 			wbkgdset(tbc.screen, COLOR_PAIR(BACK_YELLOW));
-			mvwprintw(tbc.screen, 2, tbc.width / 2 - 6,
+			mvwprintw(tbc.screen, 2, tbc.format.width / 2 - 6,
 					"--- PAUSE ---");
 		}
 
